@@ -1,0 +1,4 @@
+*.suo
+NetworkTunnelControl/bin/
+NetworkTunnelControl/obj/
+NetworkTunnelControl/packages/
