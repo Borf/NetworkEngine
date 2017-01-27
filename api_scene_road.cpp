@@ -19,7 +19,7 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 	{
 		if (engine->routes[i]->id == data["route"].asString())
 		{
-			vrlib::tien::Node* terrainRenderingNode = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
+			const vrlib::tien::Node* terrainRenderingNode = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
 
 			const Route& route = *engine->routes[i];
 			auto getPos = [&engine, &terrainRenderingNode](const glm::vec2 &p)
