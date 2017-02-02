@@ -30,9 +30,9 @@ using vrlib::logger;
 #include <VrLib/tien/components/TransformAttach.h>
 #include <VrLib/Font.h>
 
-inline std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, vrlib::json::Value &)>> &callbacks()
+inline std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> &callbacks()
 {
-	static std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, vrlib::json::Value &)>> callbacks;
+	static std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> callbacks;
 	return callbacks;
 }
 
@@ -64,20 +64,19 @@ void NetworkEngine::init()
 			tunnels.push_back(tunnel);
 		});
 
-		vrlib::json::Value packet;
+		json packet;
 		packet["id"] = "scene/reset";
 		packet["data"];
 		callbacks()["scene/reset"](this, nullptr, packet["data"]);
 
-		std::string jsonStr;
-		jsonStr << packet;
+		std::string jsonStr = packet.dump();
 		clusterData->networkPackets.push_back(jsonStr);
 
 	}
 
 
 
-/*	vrlib::json::Value save;
+/*	json save;
 	save["filename"] = "default.json";
 	save["overwrite"] = true;
 	callbacks()["scene/save"](this, nullptr, save);
@@ -202,7 +201,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 	{
 		while (t->available())
 		{
-			vrlib::json::Value v = t->recv();
+			json v = t->recv();
 			if (logFile.is_open())
 			{
 				logFile << v << std::endl;
@@ -210,11 +209,11 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 				logFile.flush();
 			}
 
-			if (v.isObject() && v.isMember("id"))
+			if (v.is_object() && v.find("id") != v.end())
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel"<<Log::newline;
-				if (callbacks().find(v["id"].asString()) != callbacks().end())
-					callbacks()[v["id"].asString()](this, t, v["data"]);
+				if (callbacks().find(v["id"]) != callbacks().end())
+					callbacks()[v["id"]](this, t, v["data"]);
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}
@@ -222,8 +221,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 				logger << "Packet received is not an object, or no ID field found!" << Log::newline;
 
 
-			std::string jsonStr;
-			jsonStr << v;
+			std::string jsonStr = v.dump();
 			clusterData->networkPackets.push_back(jsonStr);
 		}
 	}
@@ -315,7 +313,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 
 		if (glm::distance(m.node->transform->position, m.position) < 0.001f)
 		{
-			vrlib::json::Value packet;
+			json packet;
 			packet["id"] = "scene/node/moveto";
 			packet["data"]["status"] = "done";
 			packet["data"]["node"] = m.node->guid;
@@ -331,7 +329,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 		vrlib::DigitalState state = button.getData();
 		if (state == vrlib::DigitalState::TOGGLE_ON)
 		{
-			vrlib::json::Value packet;
+			json packet;
 			packet["id"] = "callback";
 			packet["data"]["button"] = button.name;
 			packet["data"]["state"] = "on";
@@ -340,7 +338,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 		}
 		if (state == vrlib::DigitalState::TOGGLE_OFF)
 		{
-			vrlib::json::Value packet;
+			json packet;
 			packet["id"] = "callback";
 			packet["data"]["button"] = button.name;
 			packet["data"]["state"] = "off";
@@ -370,13 +368,13 @@ void NetworkEngine::latePreFrame()
 	{
 		for (size_t i = 0; i < clusterData->networkPackets.size(); i++)
 		{
-			vrlib::json::Value v = vrlib::json::readJson(clusterData->networkPackets[i]);
+			json v = json::parse(clusterData->networkPackets[i]);
 
-			if (v.isObject() && v.isMember("id"))
+			if (v.is_object() && v.find("id") != v.end())
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel" << Log::newline;
-				if (callbacks().find(v["id"].asString()) != callbacks().end())
-					callbacks()[v["id"].asString()](this, nullptr, v["data"]);
+				if (callbacks().find(v["id"]) != callbacks().end())
+					callbacks()[v["id"]](this, nullptr, v["data"]);
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}

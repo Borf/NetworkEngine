@@ -9,7 +9,6 @@ namespace vrlib
 	class Texture;
 	namespace gl	{		class VAO; class CubeMap;}
 	namespace tien	{		class Terrain;	}
-	namespace json	{		class Value; }
 }
 
 
@@ -55,6 +54,6 @@ public:
 	virtual void drawForwardPass() override;
 	virtual void drawShadowMap() override;
 
-	vrlib::json::Value toJson(vrlib::json::Value &meshes) const;
+	json toJson(json &meshes) const;
 
 };

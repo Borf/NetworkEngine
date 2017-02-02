@@ -2,7 +2,7 @@
 
 #include <VrLib/gl/FBO.h>
 #include <VrLib/gl/Vertex.h>
-#include <VrLib/json.h>
+#include <VrLib/json.hpp>
 #include <VrLib/Font.h>
 #include <VrLib/gl/Vertex.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -168,9 +168,9 @@ void PanelComponent::swap()
 	((FboToTexture*)material.texture)->fbo = fbo;
 }
 
-vrlib::json::Value PanelComponent::toJson(vrlib::json::Value &meshes) const
+json PanelComponent::toJson(json &meshes) const
 {
-	vrlib::json::Value ret;
+	json ret;
 	ret["type"] = "panel";
 	return ret;
 }

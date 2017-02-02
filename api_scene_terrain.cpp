@@ -3,20 +3,20 @@
 #include <VrLib/tien/components/TerrainRenderer.h>
 #include <VrLib/tien/Terrain.h>
 
-Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("size") || !data["size"].isArray())
+	if (data.find("size") == data.end() || !data["size"].is_array())
 	{
 		sendError(tunnel, "scene/terrain/add", "Size parameter is needed");
 		return;
 	}
 
-	if (data["size"][0].asInt() > 1024 || data["size"][1].asInt() > 1024)
+	if (data["size"][0].get<int>() > 1024 || data["size"][1].get<int>() > 1024)
 	{
 		sendError(tunnel, "scene/terrain/add", "Size of terrain too big");
 		return;
 	}
-	if (data.isMember("heights") && data["heights"].size() < data["size"][0].asInt() * data["size"][1].asInt())
+	if (data.find("heights") != data.end() && data["heights"].size() < data["size"][0].get<int>() * data["size"][1].get<int>())
 	{
 		sendError(tunnel, "scene/terrain/add", "Not enough terrain height data");
 		return;
@@ -26,11 +26,11 @@ Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunn
 
 	if (!engine->terrain) //todo: multiple terrains with a seperate guid?
 		engine->terrain = new vrlib::tien::Terrain();
-	engine->terrain->setSize(data["size"][0].asInt(), data["size"][1].asInt());
-	if (data.isMember("heights"))
+	engine->terrain->setSize(data["size"][0], data["size"][1]);
+	if (data.find("heights") != data.end())
 		for (int y = 0; y < engine->terrain->getHeight(); y++)
 			for (int x = 0; x < engine->terrain->getWidth(); x++)
-				(*engine->terrain)[x][y] = data["heights"][x + engine->terrain->getWidth() * y].asFloat();
+				(*engine->terrain)[x][y] = data["heights"][x + engine->terrain->getWidth() * y].get<float>();
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
 	if (renderer)
 		renderer->getComponent<vrlib::tien::components::TerrainRenderer>()->rebuildBuffers();
@@ -38,9 +38,9 @@ Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunn
 });
 
 
-Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/terrain/update";
 	packet["status"] = "error";
 	packet["error"] = "not implemented";
@@ -48,10 +48,10 @@ Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, vrlib
 });
 
 
-Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/terrain/delete";
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (renderer)
@@ -72,20 +72,20 @@ Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, vrlib
 
 
 
-Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/terrain/getheight";
 
 	if (engine->terrain)
 	{
 		packet["status"] = "ok";
-		if(data.isMember("position"))
-			packet["data"]["height"] = engine->terrain->getPosition(glm::vec2(128 + data["position"][0].asFloat(), 128 + data["position"][1].asFloat())).y;
-		else if(data.isMember("positions"))
+		if(data.find("position") != data.end())
+			packet["data"]["height"] = engine->terrain->getPosition(glm::vec2(128 + data["position"][0].get<float>(), 128 + data["position"][1].get<float>())).y;
+		else if(data.find("positions") != data.end())
 		{
 			for(int i = 0; i < data["positions"].size(); i++)
-				packet["data"]["heights"].push_back(engine->terrain->getPosition(glm::vec2(128 + data["positions"][i][0].asFloat(), 128 + data["positions"][i][1].asFloat())).y);
+				packet["data"]["heights"].push_back(engine->terrain->getPosition(glm::vec2(128 + data["positions"][i][0].get<float>(), 128 + data["positions"][i][1].get<float>())).y);
 		}
 	}
 	else

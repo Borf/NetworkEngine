@@ -6,9 +6,9 @@
 #include <VrLib/tien/components/DynamicSkyBox.h>
 
 
-Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/clear", "id not found");
 		return;
@@ -30,9 +30,9 @@ Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, vrlib::Tunn
 });
 
 
-Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/swap", "id not found");
 		return;
@@ -53,9 +53,9 @@ Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, vrlib::Tunnel
 	sendOk(tunnel, "scene/panel/swap");
 });
 
-Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/drawlines", "id not found");
 		return;
@@ -78,13 +78,13 @@ Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, vrl
 	std::vector<vrlib::gl::VertexP3C4> verts;
 	for (size_t i = 0; i < data["lines"].size(); i++)
 	{
-		glm::vec4 color(data["lines"][i][4].asFloat(),
-						data["lines"][i][5].asFloat(),
-						data["lines"][i][6].asFloat(),
-						data["lines"][i][7].asFloat());
+		glm::vec4 color(data["lines"][i][4],
+						data["lines"][i][5],
+						data["lines"][i][6],
+						data["lines"][i][7]);
 
-		verts.push_back(vrlib::gl::VertexP3C4(glm::vec3(data["lines"][i][0].asFloat(), data["lines"][i][1].asFloat(), 0), color));
-		verts.push_back(vrlib::gl::VertexP3C4(glm::vec3(data["lines"][i][2].asFloat(), data["lines"][i][3].asFloat(), 0), color));
+		verts.push_back(vrlib::gl::VertexP3C4(glm::vec3(data["lines"][i][0], data["lines"][i][1], 0), color));
+		verts.push_back(vrlib::gl::VertexP3C4(glm::vec3(data["lines"][i][2], data["lines"][i][3], 0), color));
 	}
 	
 	int viewport[4];
@@ -101,7 +101,7 @@ Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, vrl
 	engine->debugShader->setUniform(NetworkEngine::DebugUniform::modelViewMatrix, glm::mat4());
 
 	vrlib::gl::setAttributes<vrlib::gl::VertexP3C4>(&verts[0]);
-	glLineWidth(data["width"].asFloat());
+	glLineWidth(data["width"]);
 	glDrawArrays(GL_LINES, 0, verts.size());
 	glEnable(GL_DEPTH_TEST);
 
@@ -110,21 +110,21 @@ Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, vrl
 	panel->backFbo->unbind();
 	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/panel/drawlines";
 	packet["data"]["status"] = "ok";
 	tunnel->send(packet);
 });
 
 
-Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/drawtext", "id not found");
 		return;
 	}
-	if (!data.isMember("position"))
+	if (data.find("position") == data.end())
 	{
 		sendError(tunnel, "scene/panel/drawtext", "position field not set");
 		return;
@@ -147,23 +147,23 @@ Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, vrlib
 	float size = 32;
 	glm::vec4 color = glm::vec4(0, 0, 0, 1);
 
-	if (data.isMember("font"))
-		font = data["font"].asString();
-	if (data.isMember("size"))
-		size = data["size"].asFloat();
-	if (data.isMember("color"))
-		color = glm::vec4(data["color"][0].asFloat(), data["color"][1].asFloat(), data["color"][2].asFloat(), data["color"][3].asFloat());
+	if (data.find("font") == data.end())
+		font = data["font"];
+	if (data.find("size") == data.end())
+		size = data["size"];
+	if (data.find("color") == data.end())
+		color = glm::vec4(data["color"][0], data["color"][1], data["color"][2], data["color"][3]);
 
-	if (!panel->drawText(glm::vec2(data["position"][0].asFloat(), data["position"][1].asFloat()), font, data["text"].asString(), color, size))
+	if (!panel->drawText(glm::vec2(data["position"][0], data["position"][1]), font, data["text"], color, size))
 		sendError(tunnel, "scene/panel/drawtext", "Error loading font");
 	else
 		sendOk(tunnel, "scene/panel/drawtext");
 });
 
 
-Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/setclearcolor", "id not found");
 		return;
@@ -182,21 +182,21 @@ Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* eng
 	}
 
 	for (int i = 0; i < 4; i++)
-		panel->clearColor[i] = data["color"][i].asFloat();
+		panel->clearColor[i] = data["color"][i];
 	sendOk(tunnel, "scene/panel/setclearcolor");
 
 });
 
 
 
-Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/panel/image", "id not found");
 		return;
 	}
-	if (!data.isMember("image"))
+	if (data.find("image") == data.end())
 	{
 		sendError(tunnel, "scene/panel/image", "image field not set");
 		return;
@@ -217,12 +217,12 @@ Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, vrlib::Tunn
 	glm::vec2 position(0, 0);
 	glm::vec2 size(panel->backFbo->getWidth(), panel->backFbo->getHeight());
 
-	if (data.isMember("position"))
-		position = glm::vec2(data["position"][0].asFloat(), data["position"][1].asFloat());
-	if (data.isMember("size"))
-		position = glm::vec2(data["size"][0].asFloat(), data["size"][1].asFloat());
+	if (data.find("position") == data.end())
+		position = glm::vec2(data["position"][0], data["position"][1]);
+	if (data.find("size") == data.end())
+		position = glm::vec2(data["size"][0], data["size"][1]);
 
-	if (!panel->drawImage(data["image"].asString(), position, size))
+	if (!panel->drawImage(data["image"], position, size))
 		sendError(tunnel, "scene/panel/drawtext", "Error drawing image");
 	else
 		sendOk(tunnel, "scene/panel/drawtext");

@@ -14,12 +14,11 @@
 namespace vrlib {
 	class Tunnel;
 	class Texture;
-	namespace json { class Value; }
 	namespace tien { class Terrain;  class Node; }
 }
 class Route;
 class NetworkEngine;
-std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, vrlib::json::Value &)>> &callbacks();
+std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> &callbacks();
 
 class RouteFollower
 {

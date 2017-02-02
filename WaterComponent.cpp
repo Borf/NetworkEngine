@@ -3,7 +3,7 @@
 #include <VrLib/gl/VAO.h>
 #include <VrLib/gl/shader.h>
 #include <VrLib/Texture.h>
-#include <VrLib/json.h>
+#include <VrLib/json.hpp>
 #include <VrLib/gl/Cubemap.h>
 
 #include <VrLib/tien/Terrain.h>
@@ -155,9 +155,9 @@ void WaterComponent::WaterRenderContext::init()
 }
 
 
-vrlib::json::Value WaterComponent::toJson(vrlib::json::Value &meshes) const
+json WaterComponent::toJson(json &meshes) const
 {
-	vrlib::json::Value ret;
+	json ret;
 	ret["type"] = "water";
 
 	return ret;

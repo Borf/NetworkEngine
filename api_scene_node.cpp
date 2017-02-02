@@ -11,17 +11,17 @@
 #include <VrLib/Log.h>
 using vrlib::logger;
 
-Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	vrlib::tien::Node* parent = &engine->tien.scene;
-	if (data.isMember("parent"))
+	if (data.find("parent") != data.end())
 		parent = parent->findNodeWithGuid(data["parent"]);
 	if (!parent)
 	{
 		sendError(tunnel, "scene/node/add", "Parent not found");
 		return;
 	}
-	if (!data.isMember("name"))
+	if (data.find("name") == data.end())
 	{
 		sendError(tunnel, "scene/node/add", "Name not specified");
 		return;
@@ -29,56 +29,56 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 
 
 	vrlib::tien::Node* n = new vrlib::tien::Node(data["name"], parent);
-	if (data.isMember("id"))
+	if (data.find("id") != data.end())
 		n->guid = data["id"];
 	n->addComponent(new vrlib::tien::components::Transform());
-	if (data.isMember("components"))
+	if (data.find("components") != data.end())
 	{
-		if (data["components"].isMember("transform"))
+		if (data["components"].find("transform") != data["components"].end())
 		{
-			if (!data["components"]["transform"]["scale"].isFloat() && !data["components"]["transform"]["scale"].isInt())
+			if (!data["components"]["transform"]["scale"].is_number_float() && !data["components"]["transform"]["scale"].is_number_integer())
 			{
 				sendError(tunnel, "scene/node/add", "transform/scale should be a float");
 				return;
 			}
 
-			if (data["components"]["transform"].isMember("position"))
-				n->transform->position = glm::vec3(data["components"]["transform"]["position"][0].asFloat(), data["components"]["transform"]["position"][1].asFloat(), data["components"]["transform"]["position"][2].asFloat());
-			if (data["components"]["transform"].isMember("rotation"))
-				n->transform->rotation = glm::quat(glm::vec3(glm::radians(data["components"]["transform"]["rotation"][0].asFloat()), glm::radians(data["components"]["transform"]["rotation"][1].asFloat()), glm::radians(data["components"]["transform"]["rotation"][2].asFloat())));
-			if (data["components"]["transform"].isMember("scale"))
-				n->transform->scale = glm::vec3(data["components"]["transform"]["scale"].asFloat(), data["components"]["transform"]["scale"].asFloat(), data["components"]["transform"]["scale"].asFloat());
+			if (data["components"]["transform"].find("position") != data["components"]["transform"].end())
+				n->transform->position = glm::vec3(data["components"]["transform"]["position"][0], data["components"]["transform"]["position"][1], data["components"]["transform"]["position"][2]);
+			if (data["components"]["transform"].find("rotation") != data["components"]["transform"].end())
+				n->transform->rotation = glm::quat(glm::vec3(glm::radians(data["components"]["transform"]["rotation"][0].get<float>()), glm::radians(data["components"]["transform"]["rotation"][1].get<float>()), glm::radians(data["components"]["transform"]["rotation"][2].get<float>())));
+			if (data["components"]["transform"].find("scale") != data["components"]["transform"].end())
+				n->transform->scale = glm::vec3(data["components"]["transform"]["scale"], data["components"]["transform"]["scale"], data["components"]["transform"]["scale"]);
 		}
-		if (data["components"].isMember("model"))
+		if (data["components"].find("model") != data["components"].end())
 		{
-			if (data["components"]["model"].isMember("animated") && data["components"]["model"]["animated"].asBool())
+			if (data["components"]["model"].find("animated") != data["components"]["model"].end() && data["components"]["model"]["animated"].get<bool>())
 			{
 				auto renderer = new vrlib::tien::components::AnimatedModelRenderer(data["components"]["model"]["file"]);
 
-				if (data["components"]["model"].isMember("animation"))
+				if (data["components"]["model"].find("animation") != data["components"]["model"].end())
 					renderer->playAnimation(data["components"]["model"]["animation"], true);
 
 				n->addComponent(renderer);
 			}
 			else
 			{
-				if (!data["components"]["model"].isMember("file"))
+				if (data["components"]["model"].find("file") == data["components"]["model"].end())
 				{
 					sendError(tunnel, "scene/node/add", "no file field found in model");
 					return;
 				}
-				auto renderer = new vrlib::tien::components::ModelRenderer(data["components"]["model"]["file"].asString());
-				if (data["components"]["model"].isMember("cullbackfaces"))
+				auto renderer = new vrlib::tien::components::ModelRenderer(data["components"]["model"]["file"]);
+				if (data["components"]["model"].find("cullbackfaces") != data["components"]["model"].end())
 					renderer->cullBackFaces = data["components"]["model"]["cullbackfaces"];
 				n->addComponent(renderer);
 			}
 		}
-		if (data["components"].isMember("terrain"))
+		if (data["components"].find("terrain") != data["components"].end())
 		{
 			if (!engine->terrain)
 			{
 				delete n;
-				vrlib::json::Value ret;
+				json ret;
 				ret["id"] = "scene/node/add";
 				ret["data"]["status"] = "error";
 				ret["data"]["error"] = "No terrain added";
@@ -86,29 +86,29 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 				return;
 			}
 			auto renderer = new vrlib::tien::components::TerrainRenderer(engine->terrain);
-			if (data["components"]["terrain"].isMember("smoothnormals"))
+			if (data["components"]["terrain"].find("smoothnormals") != data["components"]["terrain"].end())
 				renderer->smoothNormals = data["components"]["terrain"]["smoothnormals"];
 			n->addComponent(renderer);
 		}
-		if (data["components"].isMember("water"))
+		if (data["components"].find("water") != data["components"].end())
 		{
-			glm::vec2 size = glm::vec2(data["components"]["water"]["size"][0].asFloat(), data["components"]["water"]["size"][1].asFloat());
+			glm::vec2 size = glm::vec2(data["components"]["water"]["size"][0], data["components"]["water"]["size"][1]);
 			float resolution = 0.1f;
-			if (data["components"]["water"].isMember("resolution"))
-				resolution = data["components"]["water"]["resolution"].asFloat();
+			if (data["components"]["water"].find("resolution") != data["components"]["water"].end())
+				resolution = data["components"]["water"]["resolution"];
 			n->addComponent(new WaterComponent(size, resolution));
 		}
-		if (data["components"].isMember("panel"))
+		if (data["components"].find("panel") != data["components"].end())
 		{
-			auto panel = new PanelComponent(glm::vec2(data["components"]["panel"]["size"][0].asFloat(), data["components"]["panel"]["size"][1].asFloat()), 
-											glm::ivec2(data["components"]["panel"]["resolution"][0].asInt(), data["components"]["panel"]["resolution"][0].asInt()));
+			auto panel = new PanelComponent(glm::vec2(data["components"]["panel"]["size"][0], data["components"]["panel"]["size"][1]), 
+											glm::ivec2(data["components"]["panel"]["resolution"][0], data["components"]["panel"]["resolution"][0]));
 
-			if (data["components"]["panel"].isMember("background"))
+			if (data["components"]["panel"].find("background") != data["components"]["panel"].end())
 			{
-				panel->clearColor = glm::vec4(	data["components"]["panel"]["background"][0].asFloat(), 
-												data["components"]["panel"]["background"][1].asFloat(), 
-												data["components"]["panel"]["background"][2].asFloat(), 
-												data["components"]["panel"]["background"][3].asFloat());
+				panel->clearColor = glm::vec4(	data["components"]["panel"]["background"][0], 
+												data["components"]["panel"]["background"][1], 
+												data["components"]["panel"]["background"][2], 
+												data["components"]["panel"]["background"][3]);
 				panel->clear();
 			}
 
@@ -120,7 +120,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 
 	data["id"] = n->guid;
 
-	vrlib::json::Value ret;
+	json ret;
 	ret["id"] = "scene/node/add";
 	ret["data"]["uuid"] = n->guid;
 	ret["data"]["name"] = n->name;
@@ -130,20 +130,20 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 
 
 
-Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id") || !data["id"].isString())
+	if (data.find("id") == data.end()|| !data["id"].is_string())
 	{
 		sendError(tunnel, "scene/node/moveto", "ID field not set");
 		return;
 	}
 
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/moveto";
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (node)
 	{
-		if (data.isMember("stop"))
+		if (data.find("stop") != data.end())
 		{
 			for (int i = 0; i < (int)engine->movers.size(); i++)
 				if (engine->movers[i].node == node)
@@ -163,17 +163,17 @@ Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunn
 
 			Mover m;
 			m.node = node;
-			m.position = glm::vec3(data["position"][0].asFloat(), data["position"][1].asFloat(), data["position"][2].asFloat());
-			m.speed = data.isMember("speed") ? data["speed"].asFloat() : -1;
-			m.time = data.isMember("time") ? data["time"].asFloat() : -1;
+			m.position = glm::vec3(data["position"][0], data["position"][1], data["position"][2]);
+			m.speed = data.find("speed") != data.end() ? data["speed"] : -1;
+			m.time = data.find("time") != data.end() ? data["time"] : -1;
 			m.interpolate = Mover::Interpolate::Linear;
-			if (data.isMember("interpolate") && data["interpolate"] == "exponential")
+			if (data.find("interpolate") != data.end() && data["interpolate"] == "exponential")
 				m.interpolate = Mover::Interpolate::Exponential;
 			m.followHeight = false;
-			if(data.isMember("followheight"))
-				m.followHeight = data["followheight"].asBool();
+			if(data.find("followheight") != data.end())
+				m.followHeight = data["followheight"];
 			m.rotate = Mover::Rotate::NONE;
-			if (data.isMember("rotate"))
+			if (data.find("rotate") != data.end())
 			{
 				if (data["rotate"] == "XZ")
 					m.rotate = Mover::Rotate::XZ;
@@ -193,11 +193,11 @@ Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunn
 });
 
 
-Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/update";
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end())
 	{
 		sendError(tunnel, "scene/node/update", "id not specified");
 		return;
@@ -207,30 +207,30 @@ Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunn
 	if (node)
 	{
 		packet["data"]["status"] = "ok";
-		if (data.isMember("parent"))
+		if (data.find("parent") != data.end())
 		{
 			vrlib::tien::Node* newParent = engine->tien.scene.findNodeWithGuid(data["parent"]);
 			if (newParent)
 				node->setParent(newParent);
 			else
-				logger << "Could not find new parent " << data["parent"].asString() << " in scene/node/update, for node " << data["id"] << " with name " << node->name << Log::newline;
+				logger << "Could not find new parent " << data["parent"] << " in scene/node/update, for node " << data["id"] << " with name " << node->name << Log::newline;
 
 		}
-		if (data.isMember("transform"))
+		if (data.find("transform") != data.end())
 		{
-			if(data["transform"].isMember("position"))
-				node->transform->position = glm::vec3(data["transform"]["position"][0].asFloat(), data["transform"]["position"][1].asFloat(), data["transform"]["position"][2].asFloat());
-			if (data["transform"].isMember("rotation"))
-				node->transform->rotation = glm::quat(glm::vec3(glm::radians(data["transform"]["rotation"][0].asFloat()), glm::radians(data["transform"]["rotation"][1].asFloat()), glm::radians(data["transform"]["rotation"][2].asFloat())));
-			if (data["transform"].isMember("scale"))
-				node->transform->scale = glm::vec3(data["transform"]["scale"].asFloat(), data["transform"]["scale"].asFloat(), data["transform"]["scale"].asFloat());
+			if(data["transform"].find("position") != data["transform"].end())
+				node->transform->position = glm::vec3(data["transform"]["position"][0], data["transform"]["position"][1], data["transform"]["position"][2]);
+			if (data["transform"].find("rotation") != data["transform"].end())
+				node->transform->rotation = glm::quat(glm::vec3(glm::radians(data["transform"]["rotation"][0].get<float>()), glm::radians(data["transform"]["rotation"][1].get<float>()), glm::radians(data["transform"]["rotation"][2].get<float>())));
+			if (data["transform"].find("scale") != data["transform"].end())
+				node->transform->scale = glm::vec3(data["transform"]["scale"], data["transform"]["scale"], data["transform"]["scale"]);
 		}
-		if (data.isMember("animation"))
+		if (data.find("animation") != data.end())
 		{
-			if (data["animation"].isMember("name"))
-				node->getComponent<vrlib::tien::components::AnimatedModelRenderer>()->playAnimation(data["animation"]["name"].asString());
-			if (data["animation"].isMember("speed"))
-				node->getComponent<vrlib::tien::components::AnimatedModelRenderer>()->animationSpeed = data["animation"]["speed"].asFloat();
+			if (data["animation"].find("name") != data["animation"].end())
+				node->getComponent<vrlib::tien::components::AnimatedModelRenderer>()->playAnimation(data["animation"]["name"]);
+			if (data["animation"].find("speed") != data["animation"].end())
+				node->getComponent<vrlib::tien::components::AnimatedModelRenderer>()->animationSpeed = data["animation"]["speed"];
 		}
 
 
@@ -248,14 +248,14 @@ Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunn
 
 
 
-Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("id") || data["id"].isNull())
+	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
 		sendError(tunnel, "scene/node/addlayer", "No ID field");
 		return;
 	}
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/addlayer";
 
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
@@ -270,7 +270,7 @@ Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrli
 		else
 		{
 			packet["data"]["status"] = "ok";
-			renderer->addMaterialLayer(data["diffuse"].asString(), data["normal"].asString(), data["minHeight"].asFloat(), data["maxHeight"].asFloat(), data["fadeDist"].asFloat());
+			renderer->addMaterialLayer(data["diffuse"], data["normal"], data["minHeight"], data["maxHeight"], data["fadeDist"]);
 		}
 
 
@@ -288,9 +288,9 @@ Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrli
 
 
 
-Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/dellayer";
 	packet["status"] = "error";
 	packet["error"] = "not implemented";
@@ -299,11 +299,11 @@ Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, vrli
 
 
 
-Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/delete";
-	if (!data.isMember("id"))
+	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
 		sendError(tunnel, "scene/node/delete", "id not specified");
 		return;
@@ -326,13 +326,13 @@ Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, vrlib::Tunn
 
 
 
-Api scene_node_find("scene/node/find", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_node_find("scene/node/find", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/node/find";
-	if (data.isMember("name"))
+	if (data.find("name") != data.end())
 	{
-		vrlib::json::Value meshes(vrlib::json::Type::arrayValue);
+		json meshes = json::array();
 
 		std::vector<vrlib::tien::Node*> nodes = engine->tien.scene.findNodesWithName(data["name"]);
 		for (auto n : nodes)

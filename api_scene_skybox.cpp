@@ -3,16 +3,16 @@
 #include <VrLib/tien/components/DynamicSkyBox.h>
 #include <VrLib/tien/components/StaticSkyBox.h>
 
-Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	auto skybox = engine->tien.scene.cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>();
-	skybox->timeOfDay = data["time"].asFloat();
+	skybox->timeOfDay = data["time"];
 	sendOk(tunnel, "scene/skybox/settime");
 });
 
-Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	if (!data.isMember("type"))
+	if (data.find("type") == data.end())
 	{
 		sendError(tunnel, "scene/skybox/update", "No type field added");
 		return;
@@ -35,7 +35,7 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::
 	}
 	if (data["type"] == "static")
 	{
-		if (!data["files"].isObject() || data["files"].size() != 6)
+		if (!data["files"].is_object() || data["files"].size() != 6)
 		{
 			sendError(tunnel, "scene/skybox/update", "No files or not enough files");
 			return;
@@ -49,12 +49,12 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::
 			delete box;
 		}
 		skybox->initialize();
-		skybox->setTexture(0, data["files"]["xpos"].asString());
-		skybox->setTexture(1, data["files"]["xneg"].asString());
-		skybox->setTexture(2, data["files"]["ypos"].asString());
-		skybox->setTexture(3, data["files"]["yneg"].asString());
-		skybox->setTexture(4, data["files"]["zpos"].asString());
-		skybox->setTexture(5, data["files"]["zneg"].asString());
+		skybox->setTexture(0, data["files"]["xpos"]);
+		skybox->setTexture(1, data["files"]["xneg"]);
+		skybox->setTexture(2, data["files"]["ypos"]);
+		skybox->setTexture(3, data["files"]["yneg"]);
+		skybox->setTexture(4, data["files"]["zpos"]);
+		skybox->setTexture(5, data["files"]["zneg"]);
 
 
 	}

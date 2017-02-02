@@ -1,22 +1,23 @@
 #include "api.h"
 
 #include <fstream>
+#include <VrLib/json.hpp>
 
-Api scene_get("scene/get", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_get("scene/get", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value meshes(vrlib::json::Type::arrayValue);
+	json meshes = json::array();
 
-	vrlib::json::Value ret;
+	json ret;
 	ret["id"] = "scene/get";
 	ret["data"] = engine->tien.scene.asJson(meshes);
 	tunnel->send(ret);
 });
 
 
-Api scene_save("scene/save", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_save("scene/save", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value d;
-	d["meshes"] = vrlib::json::Value(vrlib::json::Type::arrayValue);
+	json d;
+	d["meshes"] = json::array();
 	d["tree"] = engine->tien.scene.asJson(d["meshes"]);
 
 	std::ofstream file("engine.json");
@@ -24,7 +25,7 @@ Api scene_save("scene/save", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vr
 	file.close();
 
 
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/save";
 	packet["status"] = "error";
 	packet["error"] = "not implemented";
@@ -33,15 +34,15 @@ Api scene_save("scene/save", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vr
 });
 
 
-Api scene_load("scene/load", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_load("scene/load", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	std::ifstream file("engine.json");
-	vrlib::json::Value json = vrlib::json::readJson(file);
+	json fileData = json::parse(file);
 
-	engine->tien.scene.fromJson(json["tree"], json);
+	engine->tien.scene.fromJson(fileData["tree"], fileData);
 	engine->tien.scene.cameraNode = nullptr;
 
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/load";
 	packet["status"] = "error";
 	packet["error"] = "not implemented";
@@ -50,9 +51,9 @@ Api scene_load("scene/load", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vr
 });
 
 
-Api scene_raycast("scene/raycast", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_raycast("scene/raycast", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
-	vrlib::json::Value packet;
+	json packet;
 	packet["id"] = "scene/raycast";
 	packet["status"] = "error";
 	packet["error"] = "not implemented";
@@ -60,15 +61,15 @@ Api scene_raycast("scene/raycast", [](NetworkEngine* engine, vrlib::Tunnel* tunn
 });
 
 
-Api scene_reset("scene/reset", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, vrlib::json::Value &data)
+Api scene_reset("scene/reset", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	engine->reset();
 
 	std::string nodes[] = { "Camera", "Sunlight", "LeftHand", "RightHand", "Head", "GroundPlane" };
 	for (int i = 0; i < sizeof(nodes) / sizeof(std::string); i++)
 	{
-		if (data.isMember(nodes[i]))
-			engine->tien.scene.findNodesWithName(nodes[i])[0]->guid = data[nodes[i]];
+		if (data.find(nodes[i]) != data.end())
+			engine->tien.scene.findNodesWithName(nodes[i])[0]->guid = data[nodes[i]].get<std::string>();
 		data[nodes[i]] = engine->tien.scene.findNodesWithName(nodes[i])[0]->guid;
 
 	}
@@ -76,7 +77,7 @@ Api scene_reset("scene/reset", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, 
 
 	if (tunnel)
 	{
-		vrlib::json::Value packet;
+		json packet;
 		packet["id"] = "scene/reset";
 		packet["status"] = "ok";
 		tunnel->send(packet);

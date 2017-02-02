@@ -2,13 +2,13 @@
 
 #include <string>
 #include <functional>
-#include <VrLib/json.h>
+#include <VrLib/json.hpp>
 #include <VrLib/ServerConnection.h>
 #include "NetworkEngine.h"
 
 struct Api
 {
-	Api(const std::string &route, const std::function<void(NetworkEngine*, vrlib::Tunnel*, vrlib::json::Value &)> &callback);
+	Api(const std::string &route, const std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)> &callback);
 };
 
 

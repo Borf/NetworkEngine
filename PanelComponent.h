@@ -7,7 +7,6 @@ namespace vrlib
 {
 	class Texture;
 	class TrueTypeFont;
-	namespace json { class Value; }
 	namespace gl
 	{
 		class FBO;
@@ -58,6 +57,6 @@ public:
 	bool drawText(const glm::vec2 &position, const std::string &font, const std::string &text, const glm::vec4 &color, float size);
 	bool drawImage(const std::string &image,const glm::vec2 &position, const glm::vec2 &size);
 
-	virtual vrlib::json::Value toJson(vrlib::json::Value &meshes) const;
+	virtual json toJson(json &meshes) const;
 
 };
