@@ -116,6 +116,7 @@ void NetworkEngine::reset()
 		vrlib::tien::components::Light* light = new vrlib::tien::components::Light();
 		light->color = glm::vec4(1, 1, 0.8627f, 1);
 		light->intensity = 20.0f;
+		light->directionalAmbient = 0.8;
 		light->type = vrlib::tien::components::Light::Type::directional;
 		light->shadow = vrlib::tien::components::Light::Shadow::shadowmap;
 		n->addComponent(light);

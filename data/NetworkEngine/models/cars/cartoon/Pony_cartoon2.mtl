@@ -1,0 +1,39 @@
+# Blender MTL File: 'None'
+# Material Count: 3
+
+newmtl Body_SG1
+Ns 0.000000
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 6
+map_Kd Body_dDo_d_orange.jpg
+map_Ka  Body_illumination.jpg
+map_Ks  Body_dDo_s.jpg
+
+newmtl Interior_SG
+Ns 0.000000
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 0.000000
+illum 6
+map_Kd Interior_dDo_d_black.jpg
+map_Ks  Interior_dDo_s.jpg
+
+newmtl Windows_SG
+Ns 0.000000
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd Body_dDo_d_orange.jpg
+map_Ks  Body_dDo_s.jpg
