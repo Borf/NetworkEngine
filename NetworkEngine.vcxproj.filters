@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{be4717bd-c0ff-45c1-beac-4d36cbd6b25b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\shaders">
+      <UniqueIdentifier>{a56f3a7a-1a59-4c4b-a1f3-31db354792fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -80,5 +86,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="api.htm" />
+    <None Include="data\NetworkEngine\shaders\grass.geom">
+      <Filter>data\shaders</Filter>
+    </None>
+    <None Include="data\NetworkEngine\shaders\grass.vert">
+      <Filter>data\shaders</Filter>
+    </None>
+    <None Include="data\NetworkEngine\shaders\grass.frag">
+      <Filter>data\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

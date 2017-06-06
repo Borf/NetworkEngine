@@ -13,11 +13,11 @@ GrassComponent::GrassComponent(vrlib::tien::Terrain &terrain) : terrain(terrain)
 {
 	renderContextDeferred = GrassRenderContext::getInstance();
 
-	grassTexture = vrlib::Texture::loadCached("data/TienTest/biker/textures/texture_grass.jpg");
+	grassTexture = vrlib::Texture::loadCached("data/NetworkEngine/textures/grass/grassPack.png");
 
 	std::vector<vrlib::gl::VertexP3> vertices;
 
-	int gridSize = 4;
+	int gridSize = 1; //determines number of grass patches (lower is more)
 
 	for (int x = 0; x < terrain.getWidth() - gridSize; x += gridSize)
 	{
@@ -38,7 +38,6 @@ GrassComponent::GrassComponent(vrlib::tien::Terrain &terrain) : terrain(terrain)
 		}
 	}
 
-
 	vbo.bind();
 	vbo.setData(vertices.size(), &vertices[0], GL_STATIC_DRAW);
 	vao = new vrlib::gl::VAO(&vbo);
@@ -58,13 +57,20 @@ void GrassComponent::drawDeferredPass()
 
 	GrassRenderContext* context = dynamic_cast<GrassRenderContext*>(renderContextDeferred);
 	context->renderShader->use();
-	context->renderShader->setUniform(GrassRenderContext::RenderUniform::modelMatrix, t->globalTransform);
-	context->renderShader->setUniform(GrassRenderContext::RenderUniform::normalMatrix, glm::transpose(glm::inverse(glm::mat3(t->globalTransform))));
-	context->renderShader->setUniform(GrassRenderContext::RenderUniform::modelViewProjectionMatrix, context->viewprojection * t->globalTransform);
+
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::gSampler, 0);
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::time, time);
+	//projectionmatrix and viewmatrix already set in frameSetup() method
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::modelMatrix, t->globalTransform);
+	//context->renderShader->setUniform(GrassRenderContext::RenderUniform::normalMatrix, glm::transpose(glm::inverse(glm::mat3(t->globalTransform))));
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::vColor, glm::vec4(1, 1, 1, 1));
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::fAlphaTest, 0.25f);
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::fAlphaMultiplier, 1.5f);
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::grassSize, 1.5f);
+
 	grassTexture->bind();
 	vao->bind();
-	glDrawArrays(GL_QUADS, 0, vbo.getLength());
+	glDrawArrays(GL_POINTS, 0, vbo.getLength());
 	vao->unBind();
 
 	glEnable(GL_CULL_FACE);
@@ -87,23 +93,27 @@ void GrassComponent::GrassRenderContext::frameSetup(const glm::mat4 &projectionM
 
 void GrassComponent::GrassRenderContext::init()
 {
-	renderShader = new vrlib::gl::Shader<RenderUniform>("data/TienTest/biker/shaders/grass.vert", "data/TienTest/biker/shaders/grass.frag", "data/TienTest/biker/shaders/grass.geom");
-	renderShader->bindAttributeLocation("a_position", 0);
-	renderShader->bindAttributeLocation("a_normal", 1);
-	renderShader->bindAttributeLocation("a_bitangent", 2);
-	renderShader->bindAttributeLocation("a_tangent", 3);
-	renderShader->bindAttributeLocation("a_texture", 4);
+	renderShader = new vrlib::gl::Shader<RenderUniform>("data/NetworkEngine/shaders/grass.vert", "data/NetworkEngine/shaders/grass.frag", "data/NetworkEngine/shaders/grass.geom");
 	renderShader->link();
-	renderShader->bindFragLocation("fragColor", 0);
-	renderShader->bindFragLocation("fragNormal", 1);
-	//shader->bindFragLocation("fragColor", 0);
 	renderShader->registerUniform(RenderUniform::modelMatrix, "modelMatrix");
 	renderShader->registerUniform(RenderUniform::projectionMatrix, "projectionMatrix");
 	renderShader->registerUniform(RenderUniform::viewMatrix, "viewMatrix");
-	renderShader->registerUniform(RenderUniform::normalMatrix, "normalMatrix");
-	renderShader->registerUniform(RenderUniform::s_texture, "s_texture");
-	renderShader->registerUniform(RenderUniform::modelViewProjectionMatrix, "modelViewProjectionMatrix");
+	//renderShader->registerUniform(RenderUniform::normalMatrix, "normalMatrix");
 	renderShader->registerUniform(RenderUniform::time, "time");
+	renderShader->registerUniform(RenderUniform::vColor, "vColor");
+	renderShader->registerUniform(RenderUniform::fAlphaTest, "fAlphaTest");
+	renderShader->registerUniform(RenderUniform::fAlphaMultiplier, "fAlphaMultiplier");
+	renderShader->registerUniform(RenderUniform::gSampler, "gSampler");
+	renderShader->registerUniform(GrassRenderContext::RenderUniform::grassSize, "grassSize");
 	renderShader->use();
 	renderShader->setUniform(RenderUniform::s_texture, 0);
+}
+
+
+json GrassComponent::toJson(json &meshes) const
+{
+	json ret;
+	ret["type"] = "grass";
+
+	return ret;
 }
