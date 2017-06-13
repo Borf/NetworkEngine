@@ -167,7 +167,7 @@ namespace NetworkTunnelControl
 						},
 						model = new
 						{
-							file = "data/TienTest/biker/models/trees/2/tree1.obj",
+							file = "data/NetworkEngine/models/trees/fantasy/tree1.obj",
 							cullbackfaces = false
 						}
 					}
@@ -281,8 +281,8 @@ namespace NetworkTunnelControl
 					new
 					{
 						id = terrainId,
-						diffuse = "data/TienTest/textures/grass_diffuse.png",
-						normal = "data/TienTest/textures/grass_normal.png",
+						diffuse = "data/NetworkEngine/textures/terrain/grass_diffuse.png",
+						normal = "data/NetworkEngine/textures/terrain/grass_normal.png",
 						minHeight = -10.0f,
 						maxHeight = 10.0f,
 						fadeDist = 0.5f
@@ -292,8 +292,8 @@ namespace NetworkTunnelControl
 					new
 					{
 						id = terrainId,
-						diffuse = "data/TienTest/textures/ground_diffuse.png",
-						normal = "data/TienTest/textures/ground_normal.png",
+						diffuse = "data/NetworkEngine/textures/terrain/ground_diffuse.png",
+						normal = "data/NetworkEngine/textures/terrain/ground_normal.png",
 						minHeight = 10f,
 						maxHeight = 50.0f,
 						fadeDist = 0.5f

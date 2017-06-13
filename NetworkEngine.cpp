@@ -112,7 +112,10 @@ void NetworkEngine::reset()
 	vrlib::tien::Node* sunlight;
 	{
 		vrlib::tien::Node* n = new vrlib::tien::Node("Sunlight", &tien.scene);
-		n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 1, 1)));
+		n->addComponent(new vrlib::tien::components::Transform(
+			glm::vec3(0, 0, 0), 
+			glm::quat(glm::vec3(0, glm::quarter_pi<float>(), glm::radians(-85.0f))),
+			glm::vec3(7, 7, 7)));
 		vrlib::tien::components::Light* light = new vrlib::tien::components::Light();
 		light->color = glm::vec4(1, 1, 0.8627f, 1);
 		light->intensity = 20.0f;
@@ -160,8 +163,10 @@ void NetworkEngine::reset()
 		terrain->setSize(32, 32);
 		for (int x = 0; x < 32; x++)
 			for (int y = 0; y < 32; y++)
+			{
 				(*terrain)[x][y] = 2 + sin(x / 2.0f) + cos(y / 2.0f);// rand() / (float)RAND_MAX;
 																	 //(*terrain)[x][y] = 6 + 3 * sin(y / 3.0f);
+			}
 
 		{
 			vrlib::tien::Node* n = new vrlib::tien::Node("terrain", &tien.scene);
@@ -169,7 +174,7 @@ void NetworkEngine::reset()
 			auto renderer = new vrlib::tien::components::TerrainRenderer(terrain);
 			n->addComponent(renderer);
 
-			renderer->addMaterialLayer("data/TienTest/biker/textures/grass_diffuse.png", "data/TienTest/biker/textures/grass_normal.png", "data/vrlib/tien/textures/white.png");
+			renderer->addMaterialLayer("data/NetworkEngine/textures/grass_diffuse.png", "data/NetworkEngine/textures/grass_normal.png", "data/vrlib/tien/textures/white.png");
 		}
 	}
 

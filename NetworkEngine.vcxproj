@@ -112,6 +112,10 @@
     <None Include="api.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="data\NetworkEngine\shaders\font.frag" />
+    <None Include="data\NetworkEngine\shaders\font.vert" />
+    <None Include="data\NetworkEngine\shaders\water.frag" />
+    <None Include="data\NetworkEngine\shaders\water.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

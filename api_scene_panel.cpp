@@ -147,11 +147,11 @@ Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, vrlib
 	float size = 32;
 	glm::vec4 color = glm::vec4(0, 0, 0, 1);
 
-	if (data.find("font") == data.end())
+	if (data.find("font") != data.end())
 		font = data["font"];
-	if (data.find("size") == data.end())
+	if (data.find("size") != data.end())
 		size = data["size"];
-	if (data.find("color") == data.end())
+	if (data.find("color") != data.end())
 		color = glm::vec4(data["color"][0], data["color"][1], data["color"][2], data["color"][3]);
 
 	if (!panel->drawText(glm::vec2(data["position"][0], data["position"][1]), font, data["text"], color, size))

@@ -12,7 +12,7 @@
 Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
 {
 	float heightOffset = 0.01f;
-	if (data.find("heightoffset") == data.end())
+	if (data.find("heightoffset") != data.end())
 		heightOffset = data["heightoffset"];
 
 	for (size_t i = 0; i < engine->routes.size(); i++)
@@ -38,7 +38,8 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 				auto mesh = new vrlib::tien::components::MeshRenderer::Mesh();
 				mesh->material.texture = vrlib::Texture::loadCached("data/NetworkEngine/textures/tarmac_diffuse.png");
 				mesh->material.normalmap = vrlib::Texture::loadCached("data/NetworkEngine/textures/tarmac_normal.png");
-
+				mesh->material.specularmap = vrlib::Texture::loadCached("data/NetworkEngine/textures/tarmac_specular.png");
+				mesh->material.color.shinyness = 1;
 
 
 				float inc = 0.1f;
