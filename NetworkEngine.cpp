@@ -1,6 +1,7 @@
 #include "NetworkEngine.h"
 #include "Route.h"
 #include "WaterComponent.h"
+#include "GrassComponent.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -93,7 +94,7 @@ void NetworkEngine::init()
 	logFile.open("log.txt", std::ofstream::out);
 	logFile << "[";
 
-	font = new vrlib::TrueTypeFont("segoeui");
+	font = new vrlib::TrueTypeFont("segoeui"); //This is made, why?
 	tien.start();
 }
 
@@ -119,7 +120,7 @@ void NetworkEngine::reset()
 		vrlib::tien::components::Light* light = new vrlib::tien::components::Light();
 		light->color = glm::vec4(1, 1, 0.8627f, 1);
 		light->intensity = 20.0f;
-		light->directionalAmbient = 0.8;
+		light->directionalAmbient = 0.8f;
 		light->type = vrlib::tien::components::Light::Type::directional;
 		light->shadow = vrlib::tien::components::Light::Shadow::shadowmap;
 		n->addComponent(light);
@@ -157,7 +158,7 @@ void NetworkEngine::reset()
 
 
 
-	if (false)
+	if (true)
 	{
 		terrain = new vrlib::tien::Terrain();
 		terrain->setSize(32, 32);
@@ -197,6 +198,18 @@ void NetworkEngine::reset()
 
 		n->addComponent(new vrlib::tien::components::MeshRenderer(mesh));
 	}
+
+	{
+		vrlib::tien::Node* n = new vrlib::tien::Node("GrassTest", &tien.scene);
+		n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, -0.01f, 0)));
+		n->addComponent(new GrassComponent(*terrain));
+	}
+
+	//{
+	//	vrlib::tien::Node* n = new vrlib::tien::Node("WaterTest", &tien.scene);
+	//	n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 2, 0)));
+	//	n->addComponent(new WaterComponent(glm::ivec2(10,10), 1));
+	//}
 }
 
 
