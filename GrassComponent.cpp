@@ -26,15 +26,6 @@ GrassComponent::GrassComponent(vrlib::tien::Terrain &terrain) : terrain(terrain)
 			vrlib::gl::VertexP3 v;
 			vrlib::gl::setP3(v, glm::vec3(x, terrain[x][y], y));
 			vertices.push_back(v);
-
-			vrlib::gl::setP3(v, glm::vec3(x, terrain[x][y + gridSize], y + gridSize));
-			vertices.push_back(v);
-
-			vrlib::gl::setP3(v, glm::vec3(x + gridSize, terrain[x + gridSize][y + gridSize], y + gridSize));
-			vertices.push_back(v);
-
-			vrlib::gl::setP3(v, glm::vec3(x + gridSize, terrain[x + gridSize][y], y));
-			vertices.push_back(v);
 		}
 	}
 
