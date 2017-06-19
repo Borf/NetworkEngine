@@ -7,11 +7,12 @@ layout(max_vertices = 12) out;
 uniform mat4 projectionMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;                                                                           
-//uniform mat4 normalMatrix;
+uniform mat4 normalMatrix;
 
 smooth out vec2 vTexCoord;
 smooth out vec3 vWorldPos;
 smooth out vec4 vEyeSpacePos;
+smooth out vec3 vNormal;
 
 uniform float time;
 uniform float grassSize;
@@ -91,16 +92,28 @@ void main()
 		
 		fWindPower *= fWindStrength;
 		
-		vec3 vTL = vGrassFieldPos - vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;
+
+		vec3 vTL = vGrassFieldPos - vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;//grass patch vertex top left
 		vTL.y += fGrassPatchHeight;   
+		vec3 vBL = vGrassFieldPos - vBaseDir[i]*fGrassPatchSize*0.5f;//grass patch vertex bottom left
+		vec3 vTR = vGrassFieldPos + vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;//grass patch vertex top right
+		vTR.y += fGrassPatchHeight;
+		vec3 vBR = vGrassFieldPos + vBaseDir[i]*fGrassPatchSize*0.5f;//grass patch vertex bottom right
+		  
+		vec3 nTL = vec3(modelMatrix * vec4(vTL, 1.0));
+		vec3 nBL = vec3(modelMatrix * vec4(vBL, 1.0));
+		vec3 nTR = vec3(modelMatrix * vec4(vTR, 1.0));
+
+		vec3 normal = normalize(cross(nBL - nTL, nTR - nTL));
+
 		gl_Position = mMVP*vec4(vTL, 1.0);
 		vTexCoord = vec2(fTCStartX, 1.0);
+		vNormal = normal;
 		vWorldPos = vTL;
 		vEyeSpacePos = mMV*vec4(vTL, 1.0);
 		EmitVertex();
 		
 		// Grass patch bottom left vertex
-		vec3 vBL = vGrassFieldPos - vBaseDir[i]*fGrassPatchSize*0.5f;  
 		gl_Position = mMVP*vec4(vBL, 1.0);
 		vTexCoord = vec2(fTCStartX, 0.0);
 		vWorldPos = vBL;
@@ -108,8 +121,6 @@ void main()
 		EmitVertex();
 		                               
 		// Grass patch top right vertex
-		vec3 vTR = vGrassFieldPos + vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;
-		vTR.y += fGrassPatchHeight;  
 		gl_Position = mMVP*vec4(vTR, 1.0);
 		vTexCoord = vec2(fTCEndX, 1.0);
 		vWorldPos = vTR;
@@ -117,7 +128,6 @@ void main()
 		EmitVertex();
 		
 		// Grass patch bottom right vertex
-		vec3 vBR = vGrassFieldPos + vBaseDir[i]*fGrassPatchSize*0.5f;  
 		gl_Position = mMVP*vec4(vBR, 1.0);
 		vTexCoord = vec2(fTCEndX, 0.0);
 		vWorldPos = vBR;

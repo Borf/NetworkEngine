@@ -53,7 +53,7 @@ void GrassComponent::drawDeferredPass()
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::time, time);
 	//projectionmatrix and viewmatrix already set in frameSetup() method
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::modelMatrix, t->globalTransform);
-	//context->renderShader->setUniform(GrassRenderContext::RenderUniform::normalMatrix, glm::transpose(glm::inverse(glm::mat3(t->globalTransform))));
+	context->renderShader->setUniform(GrassRenderContext::RenderUniform::normalMatrix, glm::transpose(glm::inverse(glm::mat3(t->globalTransform))));
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::vColor, glm::vec4(1, 1, 1, 1));
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::fAlphaTest, 0.25f);
 	context->renderShader->setUniform(GrassRenderContext::RenderUniform::fAlphaMultiplier, 1.5f);
@@ -85,11 +85,13 @@ void GrassComponent::GrassRenderContext::frameSetup(const glm::mat4 &projectionM
 void GrassComponent::GrassRenderContext::init()
 {
 	renderShader = new vrlib::gl::Shader<RenderUniform>("data/NetworkEngine/shaders/grass.vert", "data/NetworkEngine/shaders/grass.frag", "data/NetworkEngine/shaders/grass.geom");
+	renderShader->bindFragLocation("outputColor", 0);
+	renderShader->bindFragLocation("outputNormal", 1);
 	renderShader->link();
 	renderShader->registerUniform(RenderUniform::modelMatrix, "modelMatrix");
 	renderShader->registerUniform(RenderUniform::projectionMatrix, "projectionMatrix");
 	renderShader->registerUniform(RenderUniform::viewMatrix, "viewMatrix");
-	//renderShader->registerUniform(RenderUniform::normalMatrix, "normalMatrix");
+	renderShader->registerUniform(RenderUniform::normalMatrix, "normalMatrix");
 	renderShader->registerUniform(RenderUniform::time, "time");
 	renderShader->registerUniform(RenderUniform::vColor, "vColor");
 	renderShader->registerUniform(RenderUniform::fAlphaTest, "fAlphaTest");

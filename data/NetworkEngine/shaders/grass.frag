@@ -1,12 +1,12 @@
 #version 330
 
 smooth in vec2 vTexCoord;
-//smooth in vec3 vNormal;
-
 smooth in vec3 vWorldPos;
 smooth in vec4 vEyeSpacePos;
+smooth in vec3 vNormal;
 
 out vec4 outputColor;
+out vec4 outputNormal;
 
 uniform sampler2D gSampler;
 uniform vec4 vColor;
@@ -31,4 +31,7 @@ void main()
 	vec4 vMixedColor = vTexColor*vColor; 
 	
 	outputColor = vec4(vMixedColor.zyx, fNewAlpha);
+
+	outputNormal.xyz = vNormal;
+	outputNormal.a = 1; // shinyness
 }
