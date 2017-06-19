@@ -101,9 +101,16 @@ namespace NetworkTunnelControl
 			AutoResetEvent blocker = new AutoResetEvent(false);
 			callbacks["session/list"] = (data) =>
 			{
-				foreach (var s in data)
-					if(s.features.ToObject<List<string>>().Contains("tunnel"))
-						sessions.Add(new Session() { id = s.id, ip = s.clientinfo.host, user = s.clientinfo.user, file = s.clientinfo.file });
+                foreach (var s in data)
+                    if (s.features.ToObject<List<string>>().Contains("tunnel"))
+                        try
+                        {
+                            sessions.Add(new Session() { id = s.id, ip = s.clientinfo.host, user = s.clientinfo.user, file = s.clientinfo.file });
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
 				blocker.Set();
 			};
 			send("session/list", null);

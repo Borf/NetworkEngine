@@ -26,6 +26,11 @@ class GrassComponent : public vrlib::tien::components::Renderable
 			normalMatrix,
 			s_texture,
 			time,
+			vColor,
+			fAlphaTest,
+			fAlphaMultiplier,
+			gSampler,
+			grassSize
 		};
 		glm::mat4 viewprojection;
 		vrlib::gl::Shader<RenderUniform>* renderShader;
@@ -48,5 +53,6 @@ public:
 	virtual void drawDeferredPass() override;
 	virtual void drawForwardPass() override {};
 	virtual void drawShadowMap() override;
+	virtual json toJson(json &meshes) const override;
 
 };
