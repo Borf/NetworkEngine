@@ -1,5 +1,5 @@
 #version 330
-
+//info from http://www.mbsoftworks.sk/index.php?page=tutorials&series=1&tutorial=32 (29. Terrain Pt. 2 - Waving Grass)
 layout(points) in;
 layout(triangle_strip) out;
 layout(max_vertices = 12) out;
