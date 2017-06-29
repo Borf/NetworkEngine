@@ -112,10 +112,21 @@
     <None Include="api.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="data\NetworkEngine\shaders\font.frag" />
-    <None Include="data\NetworkEngine\shaders\font.vert" />
-    <None Include="data\NetworkEngine\shaders\water.frag" />
-    <None Include="data\NetworkEngine\shaders\water.vert" />
+    <Text Include="data\NetworkEngine\shaders\grass.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\grass.geom">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\grass.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
