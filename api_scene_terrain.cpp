@@ -3,22 +3,22 @@
 #include <VrLib/tien/components/TerrainRenderer.h>
 #include <VrLib/tien/Terrain.h>
 
-Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, json &data, json &packet)
 {
 	if (data.find("size") == data.end() || !data["size"].is_array())
 	{
-		sendError(tunnel, "scene/terrain/add", "Size parameter is needed");
+		packet["error"] = "Size parameter is needed";
 		return;
 	}
 
 	if (data["size"][0].get<int>() > 1024 || data["size"][1].get<int>() > 1024)
 	{
-		sendError(tunnel, "scene/terrain/add", "Size of terrain too big");
+		packet["error"] = "Size of terrain too big";
 		return;
 	}
 	if (data.find("heights") != data.end() && data["heights"].size() < data["size"][0].get<int>() * data["size"][1].get<int>())
 	{
-		sendError(tunnel, "scene/terrain/add", "Not enough terrain height data");
+		packet["error"] = "Not enough terrain height data";
 		return;
 	}
 
@@ -34,49 +34,36 @@ Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, vrlib::Tunn
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
 	if (renderer)
 		renderer->getComponent<vrlib::tien::components::TerrainRenderer>()->rebuildBuffers();
-	sendOk(tunnel, "scene/terrain/add");
+	packet["status"] = "ok";
 });
 
 
-Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/terrain/update";
-	packet["status"] = "error";
 	packet["error"] = "not implemented";
-	tunnel->send(packet);
 });
 
 
-Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, json &data, json &packet)
 {
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
-	json packet;
-	packet["id"] = "scene/terrain/delete";
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (renderer)
-	{
-		packet["data"]["status"] = "error";
-		packet["data"]["error"] = "terrain is still in use";
-	}
+		packet["error"] = "terrain is still in use";
 	else
 	{
 		delete engine->terrain;
 		engine->terrain = nullptr;
-		packet["data"]["status"] = "ok";
+		packet["status"] = "ok";
 	}
-	tunnel->send(packet);
 });
 
 
 
 
 
-Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/terrain/getheight";
-
 	if (engine->terrain)
 	{
 		packet["status"] = "ok";
@@ -90,7 +77,4 @@ Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine,
 	}
 	else
 		packet["status"] = "error";
-
-
-	tunnel->send(packet);
 });

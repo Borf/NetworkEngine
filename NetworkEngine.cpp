@@ -31,9 +31,9 @@ using vrlib::logger;
 #include <VrLib/tien/components/TransformAttach.h>
 #include <VrLib/Font.h>
 
-inline std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> &callbacks()
+inline std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> &callbacks()
 {
-	static std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> callbacks;
+	static std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> callbacks;
 	return callbacks;
 }
 
@@ -68,7 +68,7 @@ void NetworkEngine::init()
 		json packet;
 		packet["id"] = "scene/reset";
 		packet["data"];
-		callbacks()["scene/reset"](this, nullptr, packet["data"]);
+		callbacks()["scene/reset"](this, packet["data"], json());
 
 		std::string jsonStr = packet.dump();
 		clusterData->networkPackets.push_back(jsonStr);
@@ -158,7 +158,7 @@ void NetworkEngine::reset()
 
 
 
-	if (true)
+	if (false)
 	{
 		terrain = new vrlib::tien::Terrain();
 		terrain->setSize(32, 32);
@@ -199,6 +199,7 @@ void NetworkEngine::reset()
 		n->addComponent(new vrlib::tien::components::MeshRenderer(mesh));
 	}
 
+	if(false)
 	{
 		vrlib::tien::Node* n = new vrlib::tien::Node("GrassTest", &tien.scene);
 		n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, -0.01f, 0)));
@@ -232,7 +233,15 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel"<<Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
-					callbacks()[v["id"]](this, t, v["data"]);
+				{
+					json returnValue;
+					returnValue["id"] = v["id"];
+					if (v.find("#") != v.end())
+						returnValue["#"] = v["#"];
+					returnValue["data"]["status"] = "error";
+					callbacks()[v["id"]](this, v["data"], returnValue);
+					t->send(returnValue);
+				}
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}
@@ -393,7 +402,7 @@ void NetworkEngine::latePreFrame()
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel" << Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
-					callbacks()[v["id"]](this, nullptr, v["data"]);
+					callbacks()[v["id"]](this, v["data"], json());
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}

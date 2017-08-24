@@ -5,30 +5,33 @@
 using vrlib::logger; using vrlib::Log;
 
 
-Api::Api(const std::string &route, const std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)> &callback)
+Api::Api(const std::string &route, const std::function<void(NetworkEngine*, json &, json &)> &callback)
 {
 	callbacks()[route] = callback;
 }
 
 
-Api version("version", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api version("version", [](NetworkEngine* engine, json &data, json &packet)
 {
+	packet["data"]["status"] = "ok";
 });
 
 
 
-Api play("play", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api play("play", [](NetworkEngine* engine, json &data, json &packet)
 {
 	engine->tien.start();
+	packet["data"]["status"] = "ok";
 });
 
 
-Api pause("pause", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api pause("pause", [](NetworkEngine* engine, json &data, json &packet)
 {
 	engine->tien.pause();
+	packet["data"]["status"] = "ok";
 });
 
-Api get("get", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api get("get", [](NetworkEngine* engine, json &data, json &packet)
 {
 	bool ok = false;
 
@@ -53,14 +56,11 @@ Api get("get", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data
 	{
 		glm::vec4 position = matrix * glm::vec4(0, 0, 0, 1);
 		glm::vec4 forward = glm::normalize((matrix * glm::vec4(0, 0, -1, 1)) - position);
-		json packet;
-		packet["id"] = "get";
 		packet["data"]["status"] = "ok";
 		for (int i = 0; i < 3; i++)
 			packet["data"]["position"].push_back(position[i]);
 		for (int i = 0; i < 3; i++)
 			packet["data"]["forward"].push_back(forward[i]);
-		tunnel->send(packet);
 		return;
 	}
 
@@ -80,23 +80,14 @@ Api get("get", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data
 		else if (data["button"] == "grip")
 			button = &controller.gripButton;
 
-		json packet;
 		packet["id"] = "get";
 		packet["data"]["status"] = "ok";
 		packet["data"]["value"] = button->getData();
-		tunnel->send(packet);
 		return;
 	}
-
-
-
-	json packet;
-	packet["id"] = "get";
-	packet["data"]["status"] = "error";
-	tunnel->send(packet);
 });
 
-Api setcallback("setcallback", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api setcallback("setcallback", [](NetworkEngine* engine, json &data, json &packet)
 {
 	if (data["type"] == "button")
 	{
@@ -115,19 +106,13 @@ Api setcallback("setcallback", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, 
 		else if (data["button"] == "grip")
 			engine->callbackMask &= 1 << (hand + 3);
 
-		json packet;
-		packet["id"] = "setcallback";
 		packet["data"]["status"] = "ok";
-
 		return;
 	}
-	json packet;
-	packet["id"] = "setcallback";
-	packet["data"]["status"] = "error";
 });
 
 
-
+/*
 void sendError(vrlib::Tunnel* tunnel, const std::string &id, const std::string &error)
 {
 	if (!tunnel)
@@ -149,4 +134,4 @@ void sendOk(vrlib::Tunnel* tunnel, const std::string &id)
 	packet["id"] = id;
 	packet["data"]["status"] = "ok";
 	tunnel->send(packet);
-}
+}*/

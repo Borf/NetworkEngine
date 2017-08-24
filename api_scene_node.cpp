@@ -11,19 +11,19 @@
 #include <VrLib/Log.h>
 using vrlib::logger;
 
-Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_node_add("scene/node/add", [](NetworkEngine* engine, json &data, json &packet)
 {
 	vrlib::tien::Node* parent = &engine->tien.scene;
 	if (data.find("parent") != data.end())
 		parent = parent->findNodeWithGuid(data["parent"]);
 	if (!parent)
 	{
-		sendError(tunnel, "scene/node/add", "Parent not found");
+		packet["error"] = "Parent not found";
 		return;
 	}
 	if (data.find("name") == data.end())
 	{
-		sendError(tunnel, "scene/node/add", "Name not specified");
+		packet["error"] = "Name not specified";
 		return;
 	}
 
@@ -38,7 +38,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 		{
 			if (!data["components"]["transform"]["scale"].is_number_float() && !data["components"]["transform"]["scale"].is_number_integer())
 			{
-				sendError(tunnel, "scene/node/add", "transform/scale should be a float");
+				packet["error"] = "transform/scale should be a float";
 				return;
 			}
 
@@ -64,7 +64,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 			{
 				if (data["components"]["model"].find("file") == data["components"]["model"].end())
 				{
-					sendError(tunnel, "scene/node/add", "no file field found in model");
+					packet["error"] = "no file field found in model";
 					return;
 				}
 				auto renderer = new vrlib::tien::components::ModelRenderer(data["components"]["model"]["file"]);
@@ -78,11 +78,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 			if (!engine->terrain)
 			{
 				delete n;
-				json ret;
-				ret["id"] = "scene/node/add";
-				ret["data"]["status"] = "error";
-				ret["data"]["error"] = "No terrain added";
-				tunnel->send(ret);
+				packet["error"] = "No terrain added";
 				return;
 			}
 			auto renderer = new vrlib::tien::components::TerrainRenderer(engine->terrain);
@@ -120,26 +116,21 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 
 	data["id"] = n->guid;
 
-	json ret;
-	ret["id"] = "scene/node/add";
-	ret["data"]["uuid"] = n->guid;
-	ret["data"]["name"] = n->name;
-	ret["data"]["status"] = "ok";
-	tunnel->send(ret);
+	packet["data"]["uuid"] = n->guid;
+	packet["data"]["name"] = n->name;
+	packet["status"] = "ok";
 });
 
 
 
-Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, json &data, json &packet)
 {
 	if (data.find("id") == data.end()|| !data["id"].is_string())
 	{
-		sendError(tunnel, "scene/node/moveto", "ID field not set");
+		packet["error"] = "ID field not set";
 		return;
 	}
 
-	json packet;
-	packet["id"] = "scene/node/moveto";
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (node)
 	{
@@ -182,31 +173,28 @@ Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, vrlib::Tunn
 			}
 			engine->movers.push_back(m);
 		}
-		packet["data"]["status"] = "ok";
+		packet["status"] = "ok";
 	}
 	else
 	{
-		packet["data"]["status"] = "error";
-		packet["data"]["error"] = "node not found";
+		packet["status"] = "error";
+		packet["error"] = "node not found";
 	}
-	tunnel->send(packet);
 });
 
 
-Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_node_update("scene/node/update", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/node/update";
 	if (data.find("id") == data.end())
 	{
-		sendError(tunnel, "scene/node/update", "id not specified");
+		packet["error"] = "id not specified";
 		return;
 	}
 
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (node)
 	{
-		packet["data"]["status"] = "ok";
+		packet["status"] = "ok";
 		if (data.find("parent") != data.end())
 		{
 			vrlib::tien::Node* newParent = engine->tien.scene.findNodeWithGuid(data["parent"]);
@@ -232,31 +220,22 @@ Api scene_node_update("scene/node/update", [](NetworkEngine* engine, vrlib::Tunn
 			if (data["animation"].find("speed") != data["animation"].end())
 				node->getComponent<vrlib::tien::components::AnimatedModelRenderer>()->animationSpeed = data["animation"]["speed"];
 		}
-
-
-
-
 	}
 	else
 	{
-		packet["data"]["status"] = "error";
-		packet["data"]["error"] = "node not found";
+		packet["error"] = "node not found";
 	}
-	tunnel->send(packet);
-
 });
 
 
 
-Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, json &data, json &packet)
 {
 	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
-		sendError(tunnel, "scene/node/addlayer", "No ID field");
+		packet["error"] = "No ID field";
 		return;
 	}
-	json packet;
-	packet["id"] = "scene/node/addlayer";
 
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (node)
@@ -264,82 +243,60 @@ Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, vrli
 		auto renderer = node->getComponent<vrlib::tien::components::TerrainRenderer>();
 		if (!renderer)
 		{
-			packet["data"]["status"] = "error";
-			packet["data"]["error"] = "node has no terrain renderer";
+			packet["error"] = "node has no terrain renderer";
 		}
 		else
 		{
-			packet["data"]["status"] = "ok";
+			packet["status"] = "ok";
 			renderer->addMaterialLayer(data["diffuse"], data["normal"], data["minHeight"], data["maxHeight"], data["fadeDist"]);
 		}
-
-
-
-
 	}
 	else
 	{
-		packet["data"]["status"] = "error";
-		packet["data"]["error"] = "node not found";
+		packet["error"] = "node not found";
 	}
-	tunnel->send(packet);
 });
 
 
 
 
-Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/node/dellayer";
-	packet["status"] = "error";
 	packet["error"] = "not implemented";
-	tunnel->send(packet);
 });
 
 
 
-Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/node/delete";
 	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
-		sendError(tunnel, "scene/node/delete", "id not specified");
+		packet["error"] = "id not specified";
 		return;
 	}
 	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (node)
 	{
 		delete node;
-		packet["data"]["status"] = "ok";
+		packet["status"] = "ok";
 	}
 	else
 	{
-		packet["data"]["status"] = "error";
-		packet["data"]["error"] = "node not found";
+		packet["error"] = "node not found";
 	}
-	tunnel->send(packet);
 });
 
 
-
-
-
-Api scene_node_find("scene/node/find", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_node_find("scene/node/find", [](NetworkEngine* engine, json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "scene/node/find";
 	if (data.find("name") != data.end())
 	{
 		json meshes = json::array();
-
 		std::vector<vrlib::tien::Node*> nodes = engine->tien.scene.findNodesWithName(data["name"]);
 		for (auto n : nodes)
 			packet["data"].push_back(n->asJson(meshes));
 	}
-		
-	tunnel->send(packet);
+	packet["status"] = "ok";
 });
 
 

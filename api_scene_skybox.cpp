@@ -3,18 +3,18 @@
 #include <VrLib/tien/components/DynamicSkyBox.h>
 #include <VrLib/tien/components/StaticSkyBox.h>
 
-Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, json &data, json &packet)
 {
 	auto skybox = engine->tien.scene.cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>();
 	skybox->timeOfDay = data["time"];
-	sendOk(tunnel, "scene/skybox/settime");
+	packet["status"] = "ok";
 });
 
-Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, json &data, json &packet)
 {
 	if (data.find("type") == data.end())
 	{
-		sendError(tunnel, "scene/skybox/update", "No type field added");
+		packet["error"] = "No type field";
 		return;
 	}
 	auto cameraNode = engine->tien.scene.cameraNode;
@@ -22,7 +22,7 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::
 	{
 		if (cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>())
 		{
-			sendError(tunnel, "scene/skybox/update", "Skybox is already dynamic");
+			packet["error"] = "Skybox is already dynamic";
 			return;
 		}
 		cameraNode->addComponent(new vrlib::tien::components::DynamicSkyBox());
@@ -37,7 +37,7 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::
 	{
 		if (!data["files"].is_object() || data["files"].size() != 6)
 		{
-			sendError(tunnel, "scene/skybox/update", "No files or not enough files");
+			packet["error"] = "No files or not enough files";
 			return;
 		}
 		auto skybox = new vrlib::tien::components::StaticSkyBox();
@@ -58,9 +58,7 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, vrlib::
 
 
 	}
-
-	sendOk(tunnel, "scene/skybox/update");
-
+	packet["status"] = "ok";
 });
 	
 	

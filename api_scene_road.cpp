@@ -9,7 +9,7 @@
 #include <VrLib/tien/Terrain.h>
 #include <VrLib/Texture.h>
 
-Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_road_add("scene/road/add", [](NetworkEngine* engine, json &data, json &packet)
 {
 	float heightOffset = 0.01f;
 	if (data.find("heightoffset") != data.end())
@@ -88,7 +88,7 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 				}
 
 
-				for (int i = 0; i < mesh->indices.size(); i+=3)
+				for (size_t i = 0; i < mesh->indices.size(); i+=3)
 				{
 					glm::vec3 normal(0,1,0), tan(1,0,0), bitan(0,0,1);
 
@@ -109,30 +109,14 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, vrlib::Tunnel* tu
 				n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 0, 0)));
 				n->addComponent(new vrlib::tien::components::MeshRenderer(mesh));
 			}
-
-
-
-			json packet;
-			packet["id"] = "scene/road/add";
-			packet["data"]["status"] = "ok";
-			tunnel->send(packet);
+			packet["status"] = "ok";
 			return;
 		}
 	}
-	json packet;
-	packet["id"] = "route/delete";
-	packet["data"]["status"] = "error";
-	packet["data"]["error"] = "Route not found";
-	tunnel->send(packet);
-
-
-
-
-
-
+	packet["error"] = "Route not found";
 });
 
-Api scene_road_delete("scene/road/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api scene_road_delete("scene/road/delete", [](NetworkEngine* engine, json &data, json &packet)
 {
-	sendError(tunnel, "scene/road/delete", "Not implemented");
+	packet["error"] = "not implemented";
 });

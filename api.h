@@ -8,9 +8,9 @@
 
 struct Api
 {
-	Api(const std::string &route, const std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)> &callback);
+	Api(const std::string &route, const std::function<void(NetworkEngine*, json &, json &)> &callback);
 };
 
 
-void sendError(vrlib::Tunnel* tunnel, const std::string &packet, const std::string &error);
-void sendOk(vrlib::Tunnel* tunnel, const std::string &packet);
+//void sendError(vrlib::Tunnel* tunnel, const std::string &packet, const std::string &error);
+//void sendOk(vrlib::Tunnel* tunnel, const std::string &packet);
