@@ -14,10 +14,10 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="data">
-      <UniqueIdentifier>{d6d806d3-7f6c-4446-be0c-4b4085075a55}</UniqueIdentifier>
+      <UniqueIdentifier>{be4717bd-c0ff-45c1-beac-4d36cbd6b25b}</UniqueIdentifier>
     </Filter>
     <Filter Include="data\shaders">
-      <UniqueIdentifier>{606f2111-8f9f-4595-b7b8-e9ecf37f861e}</UniqueIdentifier>
+      <UniqueIdentifier>{a56f3a7a-1a59-4c4b-a1f3-31db354792fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -100,5 +100,11 @@
     <Text Include="data\NetworkEngine\shaders\water.frag">
       <Filter>data\shaders</Filter>
     </Text>
+    <None Include="data\NetworkEngine\shaders\grass.vert">
+      <Filter>data\shaders</Filter>
+    </None>
+    <None Include="data\NetworkEngine\shaders\grass.frag">
+      <Filter>data\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

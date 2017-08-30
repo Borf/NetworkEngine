@@ -1,6 +1,7 @@
 #include "NetworkEngine.h"
 #include "Route.h"
 #include "WaterComponent.h"
+#include "GrassComponent.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -30,9 +31,9 @@ using vrlib::logger;
 #include <VrLib/tien/components/TransformAttach.h>
 #include <VrLib/Font.h>
 
-inline std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> &callbacks()
+inline std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> &callbacks()
 {
-	static std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> callbacks;
+	static std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> callbacks;
 	return callbacks;
 }
 
@@ -67,7 +68,7 @@ void NetworkEngine::init()
 		json packet;
 		packet["id"] = "scene/reset";
 		packet["data"];
-		callbacks()["scene/reset"](this, nullptr, packet["data"]);
+		callbacks()["scene/reset"](this, packet["data"], json());
 
 		std::string jsonStr = packet.dump();
 		clusterData->networkPackets.push_back(jsonStr);
@@ -93,7 +94,7 @@ void NetworkEngine::init()
 	logFile.open("log.txt", std::ofstream::out);
 	logFile << "[";
 
-	font = new vrlib::TrueTypeFont("segoeui");
+	font = new vrlib::TrueTypeFont("segoeui"); //This is made, why?
 	tien.start();
 }
 
@@ -119,7 +120,7 @@ void NetworkEngine::reset()
 		vrlib::tien::components::Light* light = new vrlib::tien::components::Light();
 		light->color = glm::vec4(1, 1, 0.8627f, 1);
 		light->intensity = 20.0f;
-		light->directionalAmbient = 0.8;
+		light->directionalAmbient = 0.8f;
 		light->type = vrlib::tien::components::Light::Type::directional;
 		light->shadow = vrlib::tien::components::Light::Shadow::shadowmap;
 		n->addComponent(light);
@@ -192,11 +193,24 @@ void NetworkEngine::reset()
 
 		vrlib::gl::setP3(v, glm::vec3(-100, 0, -100));		vrlib::gl::setT2(v, glm::vec2(-25, -25));		mesh->vertices.push_back(v);
 		vrlib::gl::setP3(v, glm::vec3(100, 0, -100));		vrlib::gl::setT2(v, glm::vec2(25, -25));		mesh->vertices.push_back(v);
-		vrlib::gl::setP3(v, glm::vec3(100, 0, 100));		vrlib::gl::setT2(v, glm::vec2(25, 25));		mesh->vertices.push_back(v);
+		vrlib::gl::setP3(v, glm::vec3(100, 0, 100));		vrlib::gl::setT2(v, glm::vec2(25, 25));			mesh->vertices.push_back(v);
 		vrlib::gl::setP3(v, glm::vec3(-100, 0, 100));		vrlib::gl::setT2(v, glm::vec2(-25, 25));		mesh->vertices.push_back(v);
 
 		n->addComponent(new vrlib::tien::components::MeshRenderer(mesh));
 	}
+
+	if(false)
+	{
+		vrlib::tien::Node* n = new vrlib::tien::Node("GrassTest", &tien.scene);
+		n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, -0.01f, 0)));
+		n->addComponent(new GrassComponent(*terrain));
+	}
+
+	//{
+	//	vrlib::tien::Node* n = new vrlib::tien::Node("WaterTest", &tien.scene);
+	//	n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 2, 0)));
+	//	n->addComponent(new WaterComponent(glm::ivec2(10,10), 1));
+	//}
 }
 
 
@@ -219,7 +233,15 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel"<<Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
-					callbacks()[v["id"]](this, t, v["data"]);
+				{
+					json returnValue;
+					returnValue["id"] = v["id"];
+					if (v.find("#") != v.end())
+						returnValue["#"] = v["#"];
+					returnValue["data"]["status"] = "error";
+					callbacks()[v["id"]](this, v["data"], returnValue);
+					t->send(returnValue);
+				}
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}
@@ -380,7 +402,7 @@ void NetworkEngine::latePreFrame()
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel" << Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
-					callbacks()[v["id"]](this, nullptr, v["data"]);
+					callbacks()[v["id"]](this, v["data"], json());
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}

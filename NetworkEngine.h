@@ -18,7 +18,7 @@ namespace vrlib {
 }
 class Route;
 class NetworkEngine;
-std::map<std::string, std::function<void(NetworkEngine*, vrlib::Tunnel*, json &)>> &callbacks();
+std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> &callbacks();
 
 class RouteFollower
 {

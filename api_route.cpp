@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-Api route_add("route/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api route_add("route/add", [](NetworkEngine* engine, const json &data, json &packet)
 {
 	Route* r = new Route();
 	if (data.find("id") != data.end())
@@ -20,36 +20,26 @@ Api route_add("route/add", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json
 	}
 	r->finish();
 	engine->routes.push_back(r);
-
-	data["id"] = r->id;
-
-	json packet;
-	packet["id"] = "route/add";
-	packet["data"]["status"] = "ok";
+	packet["status"] = "ok";
 	packet["data"]["uuid"] = r->id;
-	tunnel->send(packet);
 });
 
 
 
-Api route_update("route/update", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api route_update("route/update", [](NetworkEngine* engine, const json &data, json &packet)
 {
 
 
 });
 
 
-Api route_delete("route/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api route_delete("route/delete", [](NetworkEngine* engine, const json &data, json &packet)
 {
 	for (size_t i = 0; i < engine->routeFollowers.size(); i++)
 	{
 		if (engine->routeFollowers[i].route->id == data["id"])
 		{
-			json packet;
-			packet["id"] = "route/delete";
-			packet["data"]["status"] = "error";
-			packet["data"]["error"] = "Route is still in use";
-			tunnel->send(packet);
+			packet["error"] = "Route is still in use";
 			return;
 		}
 	}
@@ -59,30 +49,17 @@ Api route_delete("route/delete", [](NetworkEngine* engine, vrlib::Tunnel* tunnel
 		if (engine->routes[i]->id == data["id"])
 		{
 			engine->routes.erase(engine->routes.begin() + i);
-			json packet;
-			packet["id"] = "route/delete";
-			packet["data"]["status"] = "ok";
-			tunnel->send(packet);
+			packet["status"] = "ok";
 			return;
 		}
 	}
-	json packet;
-	packet["id"] = "route/delete";
-	packet["data"]["status"] = "error";
-	packet["data"]["error"] = "Route not found";
-	tunnel->send(packet);
-
-
+	packet["error"] = "Route not found";
 });
 
 
 
-Api route_follow("route/follow", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, json &data)
+Api route_follow("route/follow", [](NetworkEngine* engine, const json &data, json &packet)
 {
-	json packet;
-	packet["id"] = "route/follow";
-	packet["data"]["status"] = "error";
-
 	bool found = false;
 	for (size_t i = 0; i <engine->routes.size(); i++)
 	{
@@ -92,7 +69,7 @@ Api route_follow("route/follow", [](NetworkEngine* engine, vrlib::Tunnel* tunnel
 			vrlib::tien::Node* n = engine->tien.scene.findNodeWithGuid(data["node"]);
 			if (!n)
 			{
-				packet["data"]["error"] = "node not found";
+				packet["error"] = "node not found";
 				break;
 			}
 			for (size_t ii = 0; ii < engine->routeFollowers.size(); ii++)
@@ -101,9 +78,8 @@ Api route_follow("route/follow", [](NetworkEngine* engine, vrlib::Tunnel* tunnel
 				if (f.node == n)
 				{
 					engine->routeFollowers.erase(engine->routeFollowers.begin() + ii);
-					packet["data"]["status"] = "ok";
+					packet["status"] = "ok";
 					packet["data"]["msg"] = "removed";
-					tunnel->send(packet);
 					return;
 				}
 			}
@@ -130,38 +106,34 @@ Api route_follow("route/follow", [](NetworkEngine* engine, vrlib::Tunnel* tunnel
 				f.positionOffset = glm::vec3(data["positionOffset"][0], data["positionOffset"][1], data["positionOffset"][2]);
 
 			engine->routeFollowers.push_back(f);
-			packet["data"]["status"] = "ok";
+			packet["status"] = "ok";
 		}
 	}
-	if(!found && packet["data"].find("error") == packet["data"].end())
-		packet["data"]["error"] = "Route not found";
-	tunnel->send(packet);
+	if(!found && packet.find("error") == packet.end())
+		packet["error"] = "Route not found";
 });
 
-Api route_follow_speed("route/follow/speed", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api route_follow_speed("route/follow/speed", [](NetworkEngine* engine, const json &data, json &packet)
 {
 	for (auto &f : engine->routeFollowers)
 	{
 		if (f.node->guid == data["node"])
 		{
 			f.speed = data["speed"];
-			sendOk(tunnel, "route/follow/speed");
+			packet["status"] = "ok";
 			return;
 		}
 	}
-	sendError(tunnel, "route/follow/speed", "Node ID not found");
+	packet["error"] = "Node ID not found";
 });
 
-Api route_show("route/show", [](NetworkEngine* engine, vrlib::Tunnel* tunnel, const json &data)
+Api route_show("route/show", [](NetworkEngine* engine, const json &data, json &packet)
 {
 	if (data.find("show") == data.end())
 		engine->showRoutes = !engine->showRoutes;
 	else
 		engine->showRoutes = data["show"];
 
-	json ret;
-	ret["id"] = "route/show";
-	ret["data"]["status"] = "ok";
-	ret["data"]["show"] = engine->showRoutes;
-
+	packet["status"] = "ok";
+	packet["data"]["show"] = engine->showRoutes;
 });
