@@ -236,9 +236,9 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 				{
 					json returnValue;
 					returnValue["id"] = v["id"];
-					if (v.find("#") != v.end())
-						returnValue["#"] = v["#"];
-					returnValue["data"]["status"] = "error";
+					if (v.find("serial") != v.end())
+						returnValue["serial"] = v["serial"];
+					returnValue["status"] = "error";
 					callbacks()[v["id"]](this, v["data"], returnValue);
 					t->send(returnValue);
 				}
