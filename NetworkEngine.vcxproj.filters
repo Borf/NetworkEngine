@@ -86,18 +86,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="api.htm" />
-    <None Include="data\NetworkEngine\shaders\font.vert">
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="data\NetworkEngine\shaders\water.vert">
       <Filter>data\shaders</Filter>
-    </None>
-    <None Include="data\NetworkEngine\shaders\water.frag">
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\font.frag">
       <Filter>data\shaders</Filter>
-    </None>
-    <None Include="data\NetworkEngine\shaders\water.vert">
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\font.vert">
       <Filter>data\shaders</Filter>
-    </None>
-    <None Include="data\NetworkEngine\shaders\font.frag">
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\water.frag">
       <Filter>data\shaders</Filter>
-    </None>
+    </Text>
     <None Include="data\NetworkEngine\shaders\grass.vert">
       <Filter>data\shaders</Filter>
     </None>

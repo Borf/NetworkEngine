@@ -112,6 +112,22 @@
     <None Include="api.htm">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <Text Include="data\NetworkEngine\shaders\font.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\font.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\water.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </Text>
+    <Text Include="data\NetworkEngine\shaders\water.vert">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </Text>
     <Text Include="data\NetworkEngine\shaders\grass.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
