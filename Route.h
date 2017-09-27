@@ -11,6 +11,9 @@ public:
 	std::string id = vrlib::util::getGuid();
 
 	void addNode(const glm::vec3 &position, const glm::vec3 &direction);
+	void setNode(int index, const glm::vec3 &position, const glm::vec3 &direction);
+	void removeNode(int index);
+
 	void finish();
 
 	glm::vec3 getPosition(float index) const;

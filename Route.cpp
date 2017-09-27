@@ -9,6 +9,24 @@ void Route::addNode(const glm::vec3 &position, const glm::vec3 &direction)
 	nodes.push_back(std::make_tuple(position, direction, 0.0f));
 }
 
+void Route::setNode(int index, const glm::vec3 & position, const glm::vec3 & direction)
+{
+	if (index == nodes.size())
+		addNode(position, direction);
+	else
+	{
+		std::get<0>(nodes[index]) = position;
+		std::get<1>(nodes[index]) = direction;
+	}
+	finish();
+}
+
+void Route::removeNode(int index)
+{
+	nodes.erase(nodes.begin() + index);
+	finish();
+}
+
 void Route::finish()
 {
 	length = 0;
@@ -43,12 +61,8 @@ glm::vec3 Route::getPosition(float index) const
 
 	float fract = index / std::get<2>(nodes[i1]);
 
-
-
 	vrlib::math::HermiteCurve<glm::vec3> hermiteCurve(std::get<0>(nodes[i1]), std::get<1>(nodes[i1]), std::get<0>(nodes[i2]), std::get<1>(nodes[i2]));
 	return hermiteCurve.getPoint(fract);
-
-
 }
 
 

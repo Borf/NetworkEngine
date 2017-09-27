@@ -28,8 +28,23 @@ Api route_add("route/add", [](NetworkEngine* engine, const json &data, json &pac
 
 Api route_update("route/update", [](NetworkEngine* engine, const json &data, json &packet)
 {
-
-
+	for (auto & route : engine->routes)
+	{
+		if (route->id == data["id"])
+		{
+			for (const auto &n : data["nodes"])
+			{
+				int index = n["index"];
+				if (n.find("pos") != n.end())
+					route->setNode(index, glm::vec3(n["pos"][0], n["pos"][1], n["pos"][2]), glm::vec3(n["dir"][0], n["dir"][1], n["dir"][2]));
+				else
+					route->removeNode(index);
+			}
+			packet["status"] = "ok";
+			return;
+		}
+	}
+	packet["error"] = "Route not found";
 });
 
 

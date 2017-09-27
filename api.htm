@@ -163,7 +163,7 @@ h1
 		</ul></li>	
 		<li>road<ul>
 			<li><a href="#scene/road/add">scene/road/add</a></li>
-			<li><a href="#scene/road/delete">scene/road/delete</a></li>
+			<li><a href="#scene/road/update">scene/road/update</a></li>
 		</ul></li>	
 	</ul></li>
 	<li>route
@@ -188,7 +188,7 @@ h1
 
 	<div class="call" id="scene/get">
 		<h2>scene/get</h2>
-		gets a json structure of the scene
+		gets a json structure of the scene. The scene is a recursive structure of nodes with all their components
 <div class="code">{
 	"id" : "scene/get"
 }
@@ -425,7 +425,8 @@ h1
 
 	<div class="call" id="scene/node/moveto">
 		<h2>scene/node/moveto</h2>
-		Use either time or speed!
+		Moves a node automatically. The movement is automatically done in the engine, so only need to send this once to start the movement, and once to stop the movement. <br />
+		<b>Use either time or speed!</b><br />
 		if stop is set, the moveto gets stopped, no more callback
 <div class="code">{
 	"id" : "scene/node/moveto",
@@ -942,12 +943,16 @@ h1
 <h1>scene/road</h1>
 	<div class="call" id="scene/road/add">
 		<h2>scene/road/add</h2>
+		Adds a node to the scene with a meshrenderer that renders a road. The road can use a different material, and can be offsetted a bit on the Y axis to prevent z-buffer fighting. Diffuse/normal/specular/heightoffset are optional
 
 <div class="code">{
 	"id" : "scene/road/add",
 	"data" :
 	{
 		"route" : "route uuid",
+		"diffuse" : "data/NetworkEngine/textures/tarmac_diffuse.png",
+		"normal" : "data/NetworkEngine/textures/tarmac_normale.png",
+		"specular" : "data/NetworkEngine/textures/tarmac_specular.png",
 		"heightoffset" : 0.01
 	}
 }
@@ -957,6 +962,7 @@ h1
 	"id" : "route/road/add",
 	"data" :
 	{
+		"uuid" : nodeid
 	}
 }</div>
 		Errors:
@@ -964,32 +970,35 @@ h1
 		</ul>
 	</div>
 
-
-<!-- ---------------------------------------------------------------------------------------------------------------------------------------------- -->
-
-
-	<div class="call" id="scene/road/delete">
-		<h2>scene/road/delete</h2>
-
+	<div class="call" id="scene/road/update">
+		<h2>scene/road/update</h2>
+		Updates the road to the route it was made with. Diffuse/normal/specular/heightoffset are optional
 <div class="code">{
-	"id" : "scene/road/delete",
+	"id" : "scene/road/update",
 	"data" :
 	{
+		"id" : "road uuid",
+		"route" : "route uuid",
+		"diffuse" : "data/NetworkEngine/textures/tarmac_diffuse.png",
+		"normal" : "data/NetworkEngine/textures/tarmac_normale.png",
+		"specular" : "data/NetworkEngine/textures/tarmac_specular.png",
+		"heightoffset" : 0.01
 	}
 }
 </div>
 		Response
 <div class="code">{
-	"id" : "route/road/delete",
+	"id" : "route/road/add",
 	"data" :
 	{
+		"uuid" : nodeid
 	}
 }</div>
 		Errors:
 		<ul>
 		</ul>
 	</div>
-
+<!-- ---------------------------------------------------------------------------------------------------------------------------------------------- -->
 
 <!-- ---------------------------------------------------------------------------------------------------------------------------------------------- -->
 <h1>route</h1>
@@ -1030,11 +1039,19 @@ h1
 
 	<div class="call" id="route/update">
 		<h2>route/update</h2>
-
+		Changes the positions of nodes in a route. An index is required to indicate which node will be changed. If the index value is equal to the current route length, a new node gets added to the route. If no pos or dir field is specified for a node, it will be removed
 <div class="code">{
 	"id" : "route/update",
 	"data" :
 	{
+		"id" : uuid,
+		"nodes" : 
+		[
+			{	"index" : 0, "pos" : [ 0, 0, 0  ],	"dir" :		[ 5, 0, -5]	},
+			{	"index" : 1, "pos" : [ 50, 0, 0 ],	"dir" :		[ 5, 0, 5]		},
+			{	"index" : 2, "pos" : [ 50, 0, 50],	"dir" :		[ -5, 0, 5]	},
+			{	"index" : 3, "pos" : [ 0, 0, 50 ],	"dir" :		[ -5, 0, -5]	},
+		],
 	}
 }
 </div>
