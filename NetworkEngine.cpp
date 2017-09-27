@@ -109,6 +109,11 @@ void NetworkEngine::reset()
 	routes.clear();
 	routeFollowers.clear();
 	movers.clear();
+	if (terrain)
+	{
+		delete terrain;
+		terrain = nullptr;
+	}
 
 	vrlib::tien::Node* sunlight;
 	{

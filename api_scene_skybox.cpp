@@ -46,7 +46,6 @@ Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, json &d
 		{
 			auto box = cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>();
 			cameraNode->removeComponent<vrlib::tien::components::DynamicSkyBox>();
-			delete box;
 		}
 		skybox->initialize();
 		skybox->setTexture(0, data["files"]["xpos"]);

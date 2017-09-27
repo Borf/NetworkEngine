@@ -47,7 +47,6 @@ Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, json 
 Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, json &data, json &packet)
 {
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
-	vrlib::tien::Node* node = engine->tien.scene.findNodeWithGuid(data["id"]);
 	if (renderer)
 		packet["error"] = "terrain is still in use";
 	else

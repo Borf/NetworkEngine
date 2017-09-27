@@ -106,7 +106,10 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, json &data, json 
 
 
 				vrlib::tien::Node* n = new vrlib::tien::Node("Road", &engine->tien.scene);
-				n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 0, 0)));
+				if(terrainRenderingNode)
+					n->addComponent(new vrlib::tien::components::Transform(terrainRenderingNode->transform->position, terrainRenderingNode->transform->rotation, terrainRenderingNode->transform->scale));
+				else
+					n->addComponent(new vrlib::tien::components::Transform(glm::vec3(0, 0, 0)));
 				n->addComponent(new vrlib::tien::components::MeshRenderer(mesh));
 			}
 			packet["status"] = "ok";
