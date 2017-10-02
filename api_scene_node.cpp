@@ -107,8 +107,8 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, json &data, json 
 												data["components"]["panel"]["background"][3]);
 				panel->clear();
 			}
-
-
+			if (data["components"]["panel"].find("castshadow") != data["components"]["panel"].end())
+				n->getComponent<vrlib::tien::components::MeshRenderer>()->castShadow = data["components"]["panel"]["castshadow"];
 			n->addComponent(panel);
 			n->addComponent(new vrlib::tien::components::MeshRenderer(panel));
 		}
