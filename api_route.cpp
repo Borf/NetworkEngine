@@ -103,10 +103,8 @@ Api route_follow("route/follow", [](NetworkEngine* engine, const json &data, jso
 			f.node = n;
 			f.route = engine->routes[i];
 			f.speed = data["speed"];
-			f.offset = data.find("offset") != data.end() ? data["offset"] : 0.0f;
-			f.followHeight = false;
-			if(data.find("followHeight") != data.end())
-				f.followHeight = data["followHeight"];
+			f.offset = data.value("offset", 0.0f);
+			f.followHeight = data.value("followHeight", false);
 			f.rotate = RouteFollower::Rotate::NONE;
 			if (data.find("rotate") != data.end())
 			{
@@ -119,7 +117,7 @@ Api route_follow("route/follow", [](NetworkEngine* engine, const json &data, jso
 				f.rotateOffset = glm::quat(glm::vec3(data["rotateOffset"][0], data["rotateOffset"][1], data["rotateOffset"][2]));
 			if (data.find("positionOffset") != data.end())
 				f.positionOffset = glm::vec3(data["positionOffset"][0], data["positionOffset"][1], data["positionOffset"][2]);
-
+			f.smoothing = data.value("smoothing", 1.0f);
 			engine->routeFollowers.push_back(f);
 			packet["status"] = "ok";
 		}

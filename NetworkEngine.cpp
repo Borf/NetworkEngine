@@ -4,6 +4,8 @@
 #include "GrassComponent.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <VrLib/ServerConnection.h>
 #include <VrLib/Kernel.h>
@@ -293,9 +295,15 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 		{
 			glm::vec3 dir = f.route->getPosition(f.offset + 0.05f) - f.node->transform->position;
 			if (f.rotate == RouteFollower::Rotate::XZ)
-				f.node->transform->rotation = glm::quat(glm::vec3(0, glm::pi<float>() - glm::atan(dir.z, dir.x), 0)) * f.rotateOffset;
+			{
+				glm::quat targetRotation = glm::quat(glm::vec3(0, glm::pi<float>() - glm::atan(dir.z, dir.x), 0)) * f.rotateOffset;
+				f.node->transform->rotation = glm::slerp(f.node->transform->rotation, targetRotation, f.smoothing);
+			}
 			if (f.rotate == RouteFollower::Rotate::XYZ)
-				f.node->transform->rotation = glm::quat(glm::inverse(glm::lookAt(f.node->transform->position, f.node->transform->position + dir, glm::vec3(0,1,0)))) * f.rotateOffset;
+			{
+				glm::quat targetRotation = glm::quat(glm::inverse(glm::lookAt(f.node->transform->position, f.node->transform->position + dir, glm::vec3(0, 1, 0)))) * f.rotateOffset;
+				f.node->transform->rotation = glm::slerp(f.node->transform->rotation, targetRotation, f.smoothing);
+			}
 		}
 
 		if (terrain && f.followHeight)

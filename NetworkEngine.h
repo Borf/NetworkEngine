@@ -37,6 +37,8 @@ public:
 
 	bool followHeight;
 
+	float smoothing = 1;
+
 	glm::quat rotateOffset;
 	glm::vec3 positionOffset;
 
