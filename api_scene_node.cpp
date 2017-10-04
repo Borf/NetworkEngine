@@ -111,6 +111,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, json &data, json 
 				n->getComponent<vrlib::tien::components::MeshRenderer>()->castShadow = data["components"]["panel"]["castshadow"];
 			n->addComponent(panel);
 			n->addComponent(new vrlib::tien::components::MeshRenderer(panel));
+			n->getComponent<vrlib::tien::components::MeshRenderer>()->useDeferred = panel->clearColor.a > 0.99;
 		}
 	}
 

@@ -178,6 +178,8 @@ Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* eng
 
 	for (int i = 0; i < 4; i++)
 		panel->clearColor[i] = data["color"][i];
+
+	node->getComponent<vrlib::tien::components::MeshRenderer>()->useDeferred = panel->clearColor.a > 0.99;
 	packet["status"] = "ok";
 });
 
