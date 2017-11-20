@@ -100,11 +100,8 @@
     <Text Include="data\NetworkEngine\shaders\water.frag">
       <Filter>data\shaders</Filter>
     </Text>
-    <None Include="data\NetworkEngine\shaders\grass.vert">
-      <Filter>data\shaders</Filter>
-    </None>
-    <None Include="data\NetworkEngine\shaders\grass.frag">
-      <Filter>data\shaders</Filter>
-    </None>
+    <Text Include="data\NetworkEngine\shaders\grass.frag" />
+    <Text Include="data\NetworkEngine\shaders\grass.geom" />
+    <Text Include="data\NetworkEngine\shaders\grass.vert" />
   </ItemGroup>
 </Project>
