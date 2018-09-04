@@ -98,7 +98,7 @@ h1
 		"id" : "2150373e-d796-4e3d-a2b7-c50be14feaa1",
 		"data" : 
 		{
-			"id" : "scene/node/movevto",
+			"id" : "scene/reset",
 			"status" : "ok"
 		}
 	}
@@ -124,6 +124,26 @@ h1
 	"error" : "error description"
 </div>
 	these status/errors are not mentioned in the API documentation, but have a seperate block with error messages
+</p>
+<h1>Serial codes</h1>
+<p>
+    It is possible to add an extra field to your packets to the networkengine, 'serial'. The networkengine will then use that serial in the reply. For instance
+    <div class="code">
+        {
+        "id" : "scene/reset",
+        "serial" : "123",
+        "data" : {}
+        }
+    </div>
+    to which the server should reply
+<div class="code">
+        {
+        "id" : "scene/reset",
+        "serial" : "123",
+        "status" : "ok"
+        }
+    </div>
+
 </p>
 <h1>Commands</h1>
 <ul>
