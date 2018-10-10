@@ -13,6 +13,7 @@ Api scene_get("scene/get", [](NetworkEngine* engine, json &data, json &packet)
 
 Api scene_save("scene/save", [](NetworkEngine* engine, json &data, json &packet)
 {
+	//TODO: add saving of terrain and routes
 	json d;
 	d["meshes"] = json::array();
 	d["tree"] = engine->tien.scene.asJson(d["meshes"]);

@@ -83,7 +83,8 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, json &data, json 
 		if (engine->routes[i]->id == data["route"])
 		{
 			const vrlib::tien::Node* terrainRenderingNode = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
-
+			
+			//TODO: use terrainRenderingNode->transform->position.y (with parents) in the code down here
 			const Route& route = *engine->routes[i];
 			auto getPos = [&engine, &terrainRenderingNode](const glm::vec2 &p)
 			{

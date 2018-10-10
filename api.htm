@@ -655,8 +655,8 @@ h1
 		"width" : 1,
 		lines : 
 		[
-			0,0, 10,10, 0,0,0,1, // x1,y1, x2,y2, r,g,b,a
-			0,0, 100,10, 0,0,0,1, // x1,y1, x2,y2, r,g,b,a
+			[ 0,0, 10,10, 0,0,0,1, // x1,y1, x2,y2, r,g,b,a ],
+			[ 0,0, 100,10, 0,0,0,1, // x1,y1, x2,y2, r,g,b,a ]
 		]
 	}
 }
@@ -1026,7 +1026,9 @@ h1
 
 	<div class="call" id="route/add">
 		<h2>route/add</h2>
-		Adds a route to the engine. A route is a virtual concept and is not visible to the user, unless debug drawing is turned on. Can be used to let nodes follow it
+		Adds a route to the engine. A route is a virtual concept and is not visible to the user, unless debug drawing is turned on. Can be used to let nodes follow it.
+        The route is made out of a number of points, and tangent vectors at those points.
+        <p><img src="hermite.png" /></p> In this picture, the P1 and P2 are 2 points defined in the route, and T1 and T2 are the corresponding 'dir' fields
 <div class="code">{
 	"id" : "route/add",
 	"data" :
