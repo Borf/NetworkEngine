@@ -31,7 +31,10 @@ Api scene_load("scene/load", [](NetworkEngine* engine, json &data, json &packet)
 	std::ifstream file("engine.json");
 	json fileData = json::parse(file);
 
-	engine->tien.scene.fromJson(fileData["tree"], fileData);
+	engine->tien.scene.fromJson(fileData["tree"], fileData, [](const json& jsonParam, const std::string stringParam)
+	{
+		return nullptr;
+	});
 	engine->tien.scene.cameraNode = nullptr;
 
 	packet["status"] = "ok";
