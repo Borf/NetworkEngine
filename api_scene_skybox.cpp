@@ -6,8 +6,14 @@
 Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, json &data, json &packet)
 {
 	auto skybox = engine->tien.scene.cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>();
-	skybox->timeOfDay = data["time"];
-	packet["status"] = "ok";
+	if (skybox) {
+		skybox->timeOfDay = data["time"];
+		packet["status"] = "ok";
+	}
+	else
+	{
+		packet["status"] = "error";
+	}
 });
 
 Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, json &data, json &packet)
