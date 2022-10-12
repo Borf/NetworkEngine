@@ -3,7 +3,7 @@
 #include <VrLib/tien/components/TerrainRenderer.h>
 #include <VrLib/tien/Terrain.h>
 
-Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("size") == data.end() || !data["size"].is_array())
 	{
@@ -38,13 +38,13 @@ Api scene_terrain_add("scene/terrain/add", [](NetworkEngine* engine, json &data,
 });
 
 
-Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_update("scene/terrain/update", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	packet["error"] = "not implemented";
 });
 
 
-Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	auto renderer = engine->tien.scene.findNodeWithComponent<vrlib::tien::components::TerrainRenderer>();
 	if (renderer)
@@ -61,7 +61,7 @@ Api scene_terrain_delete("scene/terrain/delete", [](NetworkEngine* engine, json 
 
 
 
-Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_getheight("scene/terrain/getheight", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (engine->terrain)
 	{

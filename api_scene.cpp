@@ -3,19 +3,19 @@
 #include <fstream>
 #include <VrLib/json.hpp>
 
-Api scene_get("scene/get", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_get("scene/get", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
-	json meshes = json::array();
+	nlohmann::json meshes = nlohmann::json::array();
 	packet["data"] = engine->tien.scene.asJson(meshes);
 	packet["status"] = "ok";
 });
 
 
-Api scene_save("scene/save", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_save("scene/save", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	//TODO: add saving of terrain and routes
-	json d;
-	d["meshes"] = json::array();
+	nlohmann::json d;
+	d["meshes"] = nlohmann::json::array();
 	d["tree"] = engine->tien.scene.asJson(d["meshes"]);
 
 	std::ofstream file("engine.json");
@@ -26,12 +26,12 @@ Api scene_save("scene/save", [](NetworkEngine* engine, json &data, json &packet)
 });
 
 
-Api scene_load("scene/load", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_load("scene/load", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	std::ifstream file("engine.json");
-	json fileData = json::parse(file);
+	nlohmann::json fileData = nlohmann::json::parse(file);
 
-	engine->tien.scene.fromJson(fileData["tree"], fileData, [](const json& jsonParam, const std::string stringParam)
+	engine->tien.scene.fromJson(fileData["tree"], fileData, [](const nlohmann::json& jsonParam, const std::string stringParam)
 	{
 		return nullptr;
 	});
@@ -41,13 +41,13 @@ Api scene_load("scene/load", [](NetworkEngine* engine, json &data, json &packet)
 });
 
 
-Api scene_raycast("scene/raycast", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_raycast("scene/raycast", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	packet["error"] = "not implemented";
 });
 
 
-Api scene_reset("scene/reset", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_reset("scene/reset", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	engine->reset();
 

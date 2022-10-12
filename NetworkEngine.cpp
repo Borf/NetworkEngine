@@ -33,9 +33,9 @@ using vrlib::logger;
 #include <VrLib/tien/components/TransformAttach.h>
 #include <VrLib/Font.h>
 
-inline std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> &callbacks()
+inline std::map<std::string, std::function<void(NetworkEngine*, nlohmann::json &, nlohmann::json &)>> &callbacks()
 {
-	static std::map<std::string, std::function<void(NetworkEngine*, json &, json &)>> callbacks;
+	static std::map<std::string, std::function<void(NetworkEngine*, nlohmann::json &, nlohmann::json &)>> callbacks;
 	return callbacks;
 }
 
@@ -67,10 +67,10 @@ void NetworkEngine::init()
 			tunnels.push_back(tunnel);
 		});
 
-		json packet;
+		nlohmann::json packet;
 		packet["id"] = "scene/reset";
 		packet["data"];
-		callbacks()["scene/reset"](this, packet["data"], json());
+		callbacks()["scene/reset"](this, packet["data"], nlohmann::json());
 
 		std::string jsonStr = packet.dump();
 		clusterData->networkPackets.push_back(jsonStr);
@@ -228,7 +228,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 	{
 		while (t->available())
 		{
-			json v = t->recv();
+			nlohmann::json v = t->recv();
 			if (logFile.is_open())
 			{
 				logFile << v << std::endl;
@@ -241,7 +241,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 				logger << "Got packet " << v["id"] << "Through tunnel"<<Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
 				{
-					json returnValue;
+					nlohmann::json returnValue;
 					returnValue["id"] = v["id"];
 					if (v.find("serial") != v.end())
 						returnValue["serial"] = v["serial"];
@@ -354,7 +354,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 
 		if (glm::distance(m.node->transform->position, m.position) < 0.001f)
 		{
-			json packet;
+			nlohmann::json packet;
 			packet["id"] = "scene/node/moveto";
 			packet["data"]["status"] = "done";
 			packet["data"]["node"] = m.node->guid;
@@ -370,7 +370,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 		vrlib::DigitalState state = button.getData();
 		if (state == vrlib::DigitalState::TOGGLE_ON)
 		{
-			json packet;
+			nlohmann::json packet;
 			packet["id"] = "callback";
 			packet["data"]["button"] = button.name;
 			packet["data"]["state"] = "on";
@@ -379,7 +379,7 @@ void NetworkEngine::preFrame(double frameTime, double totalTime)
 		}
 		if (state == vrlib::DigitalState::TOGGLE_OFF)
 		{
-			json packet;
+			nlohmann::json packet;
 			packet["id"] = "callback";
 			packet["data"]["button"] = button.name;
 			packet["data"]["state"] = "off";
@@ -409,13 +409,13 @@ void NetworkEngine::latePreFrame()
 	{
 		for (size_t i = 0; i < clusterData->networkPackets.size(); i++)
 		{
-			json v = json::parse(clusterData->networkPackets[i]);
+			nlohmann::json v = nlohmann::json::parse(clusterData->networkPackets[i]);
 
 			if (v.is_object() && v.find("id") != v.end())
 			{
 				logger << "Got packet " << v["id"] << "Through tunnel" << Log::newline;
 				if (callbacks().find(v["id"]) != callbacks().end())
-					callbacks()[v["id"]](this, v["data"], json());
+					callbacks()[v["id"]](this, v["data"], nlohmann::json());
 				else
 					logger << "No callback registered for packet " << v["id"] << Log::newline;
 			}

@@ -168,9 +168,9 @@ void PanelComponent::swap()
 	((FboToTexture*)material.texture)->fbo = fbo;
 }
 
-json PanelComponent::toJson(json &meshes) const
+nlohmann::json PanelComponent::toJson(nlohmann::json &meshes) const
 {
-	json ret;
+	nlohmann::json ret;
 	ret["type"] = "panel";
 	return ret;
 }

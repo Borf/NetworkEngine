@@ -72,7 +72,7 @@ void buildMesh(vrlib::tien::components::MeshRenderer::Mesh* mesh, const Route& r
 
 
 
-Api scene_road_add("scene/road/add", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_road_add("scene/road/add", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	float heightOffset = 0.01f;
 	if (data.find("heightoffset") != data.end())
@@ -122,7 +122,7 @@ Api scene_road_add("scene/road/add", [](NetworkEngine* engine, json &data, json 
 
 
 
-Api scene_road_update("scene/road/update", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_road_update("scene/road/update", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	for (size_t i = 0; i < engine->routes.size(); i++)
 	{

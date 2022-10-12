@@ -8,7 +8,7 @@
 
 struct Api
 {
-	Api(const std::string &route, const std::function<void(NetworkEngine*, json &, json &)> &callback);
+	Api(const std::string &route, const std::function<void(NetworkEngine*, nlohmann::json &, nlohmann::json &)> &callback);
 };
 
 

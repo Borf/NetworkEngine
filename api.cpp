@@ -5,33 +5,33 @@
 using vrlib::logger; using vrlib::Log;
 
 
-Api::Api(const std::string &route, const std::function<void(NetworkEngine*, json &, json &)> &callback)
+Api::Api(const std::string &route, const std::function<void(NetworkEngine*, nlohmann::json &, nlohmann::json &)> &callback)
 {
 	callbacks()[route] = callback;
 }
 
 
-Api version("version", [](NetworkEngine* engine, json &data, json &packet)
+Api version("version", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	packet["data"]["status"] = "ok";
 });
 
 
 
-Api play("play", [](NetworkEngine* engine, json &data, json &packet)
+Api play("play", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	engine->tien.start();
 	packet["data"]["status"] = "ok";
 });
 
 
-Api pause("pause", [](NetworkEngine* engine, json &data, json &packet)
+Api pause("pause", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	engine->tien.pause();
 	packet["data"]["status"] = "ok";
 });
 
-Api get("get", [](NetworkEngine* engine, json &data, json &packet)
+Api get("get", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	bool ok = false;
 
@@ -87,7 +87,7 @@ Api get("get", [](NetworkEngine* engine, json &data, json &packet)
 	}
 });
 
-Api setcallback("setcallback", [](NetworkEngine* engine, json &data, json &packet)
+Api setcallback("setcallback", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data["type"] == "button")
 	{

@@ -11,7 +11,7 @@
 #include <VrLib/Log.h>
 using vrlib::logger;
 
-Api scene_node_add("scene/node/add", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_node_add("scene/node/add", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	vrlib::tien::Node* parent = &engine->tien.scene;
 	if (data.find("parent") != data.end())
@@ -124,7 +124,7 @@ Api scene_node_add("scene/node/add", [](NetworkEngine* engine, json &data, json 
 
 
 
-Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end()|| !data["id"].is_string())
 	{
@@ -184,7 +184,7 @@ Api scene_node_moveto("scene/node/moveto", [](NetworkEngine* engine, json &data,
 });
 
 
-Api scene_node_update("scene/node/update", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_node_update("scene/node/update", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -230,7 +230,7 @@ Api scene_node_update("scene/node/update", [](NetworkEngine* engine, json &data,
 
 
 
-Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
@@ -261,14 +261,14 @@ Api scene_terrain_addlayer("scene/node/addlayer", [](NetworkEngine* engine, json
 
 
 
-Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_terrain_dellayer("scene/node/dellayer", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	packet["error"] = "not implemented";
 });
 
 
 
-Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end() || !data["id"].is_string())
 	{
@@ -288,11 +288,11 @@ Api scene_node_delete("scene/node/delete", [](NetworkEngine* engine, json &data,
 });
 
 
-Api scene_node_find("scene/node/find", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_node_find("scene/node/find", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("name") != data.end())
 	{
-		json meshes = json::array();
+		nlohmann::json meshes = nlohmann::json::array();
 		std::vector<vrlib::tien::Node*> nodes = engine->tien.scene.findNodesWithName(data["name"]);
 		for (auto n : nodes)
 			packet["data"].push_back(n->asJson(meshes));

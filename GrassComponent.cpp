@@ -103,9 +103,9 @@ void GrassComponent::GrassRenderContext::init()
 }
 
 
-json GrassComponent::toJson(json &meshes) const
+nlohmann::json GrassComponent::toJson(nlohmann::json &meshes) const
 {
-	json ret;
+	nlohmann::json ret;
 	ret["type"] = "grass";
 
 	return ret;

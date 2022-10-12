@@ -6,7 +6,7 @@
 #include <VrLib/tien/components/DynamicSkyBox.h>
 
 
-Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -30,7 +30,7 @@ Api scene_panel_clear("scene/panel/clear", [](NetworkEngine* engine, json &data,
 });
 
 
-Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -53,7 +53,7 @@ Api scene_panel_swap("scene/panel/swap", [](NetworkEngine* engine, json &data, j
 	packet["status"] = "ok";
 });
 
-Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -113,7 +113,7 @@ Api scene_panel_drawlines("scene/panel/drawlines", [](NetworkEngine* engine, jso
 });
 
 
-Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -156,7 +156,7 @@ Api scene_panel_drawtext("scene/panel/drawtext", [](NetworkEngine* engine, json 
 });
 
 
-Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{
@@ -185,7 +185,7 @@ Api scene_panel_setclearcolor("scene/panel/setclearcolor", [](NetworkEngine* eng
 
 
 
-Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("id") == data.end())
 	{

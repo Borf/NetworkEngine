@@ -3,7 +3,7 @@
 #include <VrLib/tien/components/DynamicSkyBox.h>
 #include <VrLib/tien/components/StaticSkyBox.h>
 
-Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	auto skybox = engine->tien.scene.cameraNode->getComponent<vrlib::tien::components::DynamicSkyBox>();
 	if (skybox) {
@@ -16,7 +16,7 @@ Api scene_skybox_settime("scene/skybox/settime", [](NetworkEngine* engine, json 
 	}
 });
 
-Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, json &data, json &packet)
+Api scene_skybox_update("scene/skybox/update", [](NetworkEngine* engine, nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("type") == data.end())
 	{

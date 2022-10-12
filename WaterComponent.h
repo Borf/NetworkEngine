@@ -54,6 +54,6 @@ public:
 	virtual void drawForwardPass() override;
 	virtual void drawShadowMap() override;
 
-	json toJson(json &meshes) const;
+	nlohmann::json toJson(nlohmann::json &meshes) const;
 
 };

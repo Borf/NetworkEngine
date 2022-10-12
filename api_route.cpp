@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-Api route_add("route/add", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_add("route/add", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	Route* r = new Route();
 	if (data.find("id") != data.end())
@@ -26,7 +26,7 @@ Api route_add("route/add", [](NetworkEngine* engine, const json &data, json &pac
 
 
 
-Api route_update("route/update", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_update("route/update", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	for (auto & route : engine->routes)
 	{
@@ -48,7 +48,7 @@ Api route_update("route/update", [](NetworkEngine* engine, const json &data, jso
 });
 
 
-Api route_delete("route/delete", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_delete("route/delete", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	for (size_t i = 0; i < engine->routeFollowers.size(); i++)
 	{
@@ -73,7 +73,7 @@ Api route_delete("route/delete", [](NetworkEngine* engine, const json &data, jso
 
 
 
-Api route_follow("route/follow", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_follow("route/follow", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	bool found = false;
 	for (size_t i = 0; i <engine->routes.size(); i++)
@@ -126,7 +126,7 @@ Api route_follow("route/follow", [](NetworkEngine* engine, const json &data, jso
 		packet["error"] = "Route not found";
 });
 
-Api route_follow_speed("route/follow/speed", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_follow_speed("route/follow/speed", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	for (auto &f : engine->routeFollowers)
 	{
@@ -140,7 +140,7 @@ Api route_follow_speed("route/follow/speed", [](NetworkEngine* engine, const jso
 	packet["error"] = "Node ID not found";
 });
 
-Api route_show("route/show", [](NetworkEngine* engine, const json &data, json &packet)
+Api route_show("route/show", [](NetworkEngine* engine, const nlohmann::json &data, nlohmann::json &packet)
 {
 	if (data.find("show") == data.end())
 		engine->showRoutes = !engine->showRoutes;
