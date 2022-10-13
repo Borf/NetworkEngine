@@ -213,9 +213,9 @@ Api scene_panel_image("scene/panel/image", [](NetworkEngine* engine, nlohmann::j
 	glm::vec2 position(0, 0);
 	glm::vec2 size(panel->backFbo->getWidth(), panel->backFbo->getHeight());
 
-	if (data.find("position") == data.end())
+	if (data.find("position") != data.end())
 		position = glm::vec2(data["position"][0], data["position"][1]);
-	if (data.find("size") == data.end())
+	if (data.find("size") != data.end())
 		position = glm::vec2(data["size"][0], data["size"][1]);
 
 	if (!panel->drawImage(data["image"], position, size))
